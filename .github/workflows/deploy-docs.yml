@@ -32,21 +32,47 @@ jobs:
         # Създай основна структура
         mkdir -p _site
         
-        # Копирай всички markdown файлове
+        # Копирай всички файлове
         cp -r . _site/
+        
+        # Създай index.html ако не съществува
+        if [ ! -f "_site/index.html" ]; then
+          cat > _site/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="bg">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>K3s-Odoo Документация</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                h1 { color: #333; }
+                ul { list-style-type: none; padding: 0; }
+                li { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+                a { text-decoration: none; color: #0066cc; font-weight: bold; }
+                a:hover { color: #004499; }
+            </style>
+        </head>
+        <body>
+            <h1>📚 K3s-Odoo Документация</h1>
+            <ul>
+                <li><a href="README.md">🏠 Главна страница</a></li>
+                <li><a href="docs/README-k3s-odoo-18.md">🐳 Odoo 18 с K3s</a></li>
+                <li><a href="docs/README-VM.md">🖥️ Виртуална машина</a></li>
+                <li><a href="docs/README-BAREBONE.md">⚡ Barebone деплой</a></li>
+                <li><a href="docs/MIGRATION-GUIDE.md">🔄 Миграция</a></li>
+                <li><a href="docs/TROUBLESHOOTING.md">🔧 Отстраняване на проблеми</a></li>
+            </ul>
+        </body>
+        </html>
+        EOF
+        fi
         
         # Създай CNAME за custom domain
         echo "docs.odoo-shell.dev" > _site/CNAME
         
         # Деактивирай Jekyll
         touch _site/.nojekyll
-        
-        # Създай robots.txt
-        cat > _site/robots.txt << EOF
-        User-agent: *
-        Allow: /
-        Sitemap: https://docs.odoo-shell.dev/sitemap.xml
-        EOF
 
     - name: 📦 Setup Pages
       uses: actions/configure-pages@v4
