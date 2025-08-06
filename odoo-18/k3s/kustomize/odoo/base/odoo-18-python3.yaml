@@ -1,0 +1,15 @@
+# 🐍 Python3 Volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: PLACEHOLDER_PYTHON3_PVC_NAME
+  labels:
+    app: PLACEHOLDER_APP_LABEL
+    volume-type: python3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: PLACEHOLDER_PYTHON3_SIZE
+  storageClassName: PLACEHOLDER_STORAGE_CLASS

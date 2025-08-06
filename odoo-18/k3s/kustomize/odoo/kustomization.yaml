@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- config.yaml
+- odoo-18-namespace.yaml
+- base/odoo-18-data.yaml
+- base/odoo-18-external.yaml
+- base/odoo-18-opt.yaml
+- base/odoo-18-python3.yaml
+- base/odoo-18-db.yaml
+- base/odoo-18.yaml
+- base/odoo-18-traefik.yaml
+
+# 🧩 Import replacements като компонент
+components:
+- replacements.yaml
+
+configMapGenerator:
+- name: odoo-18-config-data
+  files:
+    - ./conf/odoo.conf
+    - ./conf/addons.conf
+
+secretGenerator:
+- name: contabo-creds-odoo-18
+  literals:
+  - ACCESS_KEY_ID=56c1adc45b55b8fed54cee90b7c9cd8a
+  - ACCESS_SECRET_KEY=3fdc56d0b95412fad6cbdd65db31105d
+
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/part-of: odoo-platform
+
+commonAnnotations:
+  config.kubernetes.io/origin: |
+    Hybrid template + Kustomize configuration
+    Generated from: config-template.yaml -> config.yaml

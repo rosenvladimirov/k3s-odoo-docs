@@ -1,0 +1,15 @@
+# 📦 External Volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: PLACEHOLDER_EXTERNAL_PVC_NAME
+  labels:
+    app: PLACEHOLDER_APP_LABEL
+    volume-type: external
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: PLACEHOLDER_EXTERNAL_SIZE
+  storageClassName: PLACEHOLDER_STORAGE_CLASS

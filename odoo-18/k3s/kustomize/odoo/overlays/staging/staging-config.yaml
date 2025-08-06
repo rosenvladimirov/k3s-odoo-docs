@@ -1,0 +1,27 @@
+# staging-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  replicas: "2"
+  cpu-limit: "4000m"
+  memory-limit: "8Gi"
+  image-tag: "staging-18.0"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-config
+data:
+  debug-mode: "false"
+  enable-ssl: "true"
+  enable-monitoring: "true"
+  log-level: "INFO"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-config
+data:
+  hostname: "staging.company.com"

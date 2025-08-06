@@ -1,0 +1,47 @@
+name: 📚 Deploy K3s-Odoo Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ '**.md', 'assets/**' ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+    - name: 📁 Checkout
+      uses: actions/checkout@v4
+
+    - name: 📝 Setup Static Files
+      run: |
+        # Създай CNAME за custom domain
+        echo "docs.odoo-shell.dev" > CNAME
+        
+        # Деактивирай Jekyll
+        touch .nojekyll
+        
+        # Създай robots.txt
+        cat > robots.txt << EOF
+        User-agent: *
+        Allow: /
+        Sitemap: https://docs.odoo-shell.dev/sitemap.xml
+        EOF
+
+    - name: 🚀 Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
+        cname: docs.odoo-shell.dev
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: 'docs: update documentation'
+        enable_jekyll: false

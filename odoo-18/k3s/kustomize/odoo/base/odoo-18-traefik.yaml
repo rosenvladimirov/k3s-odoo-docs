@@ -1,0 +1,42 @@
+# 🌐 HYBRID INGRESS TEMPLATE
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: PLACEHOLDER_INGRESS_NAME
+  labels:
+    app: PLACEHOLDER_INGRESS_APP_LABEL
+  annotations:
+    cert-manager.io/cluster-issuer: PLACEHOLDER_CERT_ISSUER
+    kubernetes.io/ingress.class: PLACEHOLDER_INGRESS_CLASS
+    # ✅ Environment-specific annotations
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    # 🔒 Security headers
+    nginx.ingress.kubernetes.io/server-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+spec:
+  rules:
+  - host: PLACEHOLDER_HOSTNAME
+    http:
+      paths:
+      - path: PLACEHOLDER_MAIN_PATH
+        pathType: PLACEHOLDER_PATH_TYPE
+        backend:
+          service:
+            name: PLACEHOLDER_BACKEND_SERVICE_NAME
+            port:
+              number: PLACEHOLDER_MAIN_PORT
+      - path: PLACEHOLDER_LONGPOLLING_PATH
+        pathType: PLACEHOLDER_PATH_TYPE
+        backend:
+          service:
+            name: PLACEHOLDER_BACKEND_SERVICE_NAME
+            port:
+              number: PLACEHOLDER_LONGPOLLING_PORT
+  tls:
+  - hosts:
+    - PLACEHOLDER_HOSTNAME
+    secretName: PLACEHOLDER_TLS_SECRET_NAME

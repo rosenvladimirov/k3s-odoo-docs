@@ -1,0 +1,94 @@
+# 🐘 HYBRID POSTGRESQL CLUSTER TEMPLATE
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: PLACEHOLDER_CLUSTER_NAME
+  labels:
+    app: postgres
+    version: "17"
+spec:
+  instances: PLACEHOLDER_INSTANCES
+  
+  # 🔧 PostgreSQL configuration
+  postgresql:
+    parameters:
+      shared_buffers: PLACEHOLDER_SHARED_BUFFERS
+      max_connections: PLACEHOLDER_MAX_CONNECTIONS
+      work_mem: PLACEHOLDER_WORK_MEM
+      effective_cache_size: "20GB"
+      maintenance_work_mem: "2GB"
+      checkpoint_completion_target: "0.9"
+      wal_buffers: "16MB"
+      default_statistics_target: "100"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+  
+  # 💾 Storage
+  storage:
+    size: PLACEHOLDER_STORAGE_SIZE
+    storageClass: PLACEHOLDER_STORAGE_CLASS
+  
+  # 🏗️ Resources
+  resources:
+    requests:
+      memory: PLACEHOLDER_DB_MEMORY_REQUEST
+      cpu: PLACEHOLDER_DB_CPU_REQUEST
+    limits:
+      memory: PLACEHOLDER_DB_MEMORY_LIMIT
+      cpu: PLACEHOLDER_DB_CPU_LIMIT
+  
+  # 🔐 Bootstrap configuration
+  bootstrap:
+    initdb:
+      database: PLACEHOLDER_DATABASE_NAME
+      owner: PLACEHOLDER_ADMIN_USER
+      secret:
+        name: PLACEHOLDER_ADMIN_SECRET
+  
+  # 👥 Managed users
+  managed:
+    roles:
+    - name: PLACEHOLDER_ADMIN_USER
+      ensure: present
+      login: true
+      superuser: true
+      passwordSecret:
+        name: PLACEHOLDER_ADMIN_SECRET
+    - name: PLACEHOLDER_APP_USER
+      ensure: present
+      login: true
+      passwordSecret:
+        name: PLACEHOLDER_APP_SECRET
+  
+  # 📦 Backup configuration
+  backup:
+    barmanObjectStore:
+      destinationPath: PLACEHOLDER_BACKUP_BUCKET
+      endpointURL: PLACEHOLDER_BACKUP_ENDPOINT
+      s3Credentials:
+        accessKeyId:
+          name: PLACEHOLDER_SECRET_NAME
+          key: access-key
+        secretAccessKey:
+          name: PLACEHOLDER_SECRET_NAME
+          key: secret-key
+---
+# 🔐 Database Admin Secret Template
+apiVersion: v1
+kind: Secret
+metadata:
+  name: PLACEHOLDER_ADMIN_SECRET
+type: kubernetes.io/basic-auth
+data:
+  username: PLACEHOLDER_BASE64_ADMIN_USER
+  password: PLACEHOLDER_BASE64_ADMIN_PASSWORD
+---
+# 🔐 Database App Secret Template  
+apiVersion: v1
+kind: Secret
+metadata:
+  name: PLACEHOLDER_APP_SECRET
+type: kubernetes.io/basic-auth
+data:
+  username: PLACEHOLDER_BASE64_APP_USER
+  password: PLACEHOLDER_BASE64_APP_PASSWORD

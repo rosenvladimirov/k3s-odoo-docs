@@ -1,0 +1,408 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Component
+
+replacements:
+
+# ===== NAMESPACE & ENVIRONMENT =====
+- source:
+    kind: ConfigMap
+    name: namespace-config
+    fieldPath: data.namespace
+  targets:
+  - select:
+      kind: Kustomization
+    fieldPaths:
+    - namespace
+    options:
+      create: true
+
+- source:
+    kind: ConfigMap
+    name: namespace-config
+    fieldPath: data.environment
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.metadata.labels.environment
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].env.[name=DEPLOYMENT_ENV].value
+
+# ===== APP CONFIGURATION =====
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.app-name
+  targets:
+  - select:
+      name: PLACEHOLDER_APP_NAME
+    fieldPaths:
+    - metadata.name
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.service-name
+  targets:
+  - select:
+      name: PLACEHOLDER_SERVICE_NAME
+    fieldPaths:
+    - metadata.name
+
+# ===== IMAGE CONFIGURATION =====
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.image-repository
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].image
+    - spec.template.spec.initContainers.[name=supervisor-odoo].image
+    options:
+      delimiter: ':'
+      index: 0
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.image-tag
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].image
+    - spec.template.metadata.labels.version
+    options:
+      delimiter: ':'
+      index: 1
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.supervisor-tag
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.initContainers.[name=supervisor-odoo].image
+    options:
+      delimiter: ':'
+      index: 1
+
+# ===== REPLICAS CONFIGURATION =====
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.replicas
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.replicas
+
+# ===== RESOURCE CONFIGURATION =====
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.cpu-limit
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].resources.limits.cpu
+    - spec.template.spec.initContainers.[name=supervisor-odoo].resources.limits.cpu
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.memory-limit
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].resources.limits.memory
+    - spec.template.spec.initContainers.[name=supervisor-odoo].resources.limits.memory
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.cpu-request
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].resources.requests.cpu
+    - spec.template.spec.initContainers.[name=supervisor-odoo].resources.requests.cpu
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.memory-request
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].resources.requests.memory
+    - spec.template.spec.initContainers.[name=supervisor-odoo].resources.requests.memory
+
+# ===== DATABASE ENV VARS =====
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.db-host
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].env.[name=HOST].value
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.db-user
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].env.[name=USER].value
+
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.db-password
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].env.[name=PASSWORD].value
+
+# ===== CONFIGMAP REFERENCES =====
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.config-map-name
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.volumes.[name=conf].configMap.name
+    - spec.template.spec.volumes.[name=conf-addons].configMap.name
+
+# ===== PVC CONFIGURATION =====
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.data-pvc
+  targets:
+  - select:
+      name: PLACEHOLDER_DATA_PVC_NAME
+    fieldPaths:
+    - metadata.name
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.volumes.[name=data].persistentVolumeClaim.claimName
+
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.opt-pvc
+  targets:
+  - select:
+      name: PLACEHOLDER_OPT_PVC_NAME
+    fieldPaths:
+    - metadata.name
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.volumes.[name=opt].persistentVolumeClaim.claimName
+
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.python3-pvc
+  targets:
+  - select:
+      name: PLACEHOLDER_PYTHON3_PVC_NAME
+    fieldPaths:
+    - metadata.name
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.volumes.[name=python3].persistentVolumeClaim.claimName
+
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.external-pvc
+  targets:
+  - select:
+      name: PLACEHOLDER_EXTERNAL_PVC_NAME
+    fieldPaths:
+    - metadata.name
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.volumes.[name=mnt].persistentVolumeClaim.claimName
+
+# ===== STORAGE SIZES =====
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.data-size
+  targets:
+  - select:
+      name: PLACEHOLDER_DATA_PVC_NAME
+    fieldPaths:
+    - spec.resources.requests.storage
+
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.opt-size
+  targets:
+  - select:
+      name: PLACEHOLDER_OPT_PVC_NAME
+    fieldPaths:
+    - spec.resources.requests.storage
+
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.python3-size
+  targets:
+  - select:
+      name: PLACEHOLDER_PYTHON3_PVC_NAME
+    fieldPaths:
+    - spec.resources.requests.storage
+
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.external-size
+  targets:
+  - select:
+      name: PLACEHOLDER_EXTERNAL_PVC_NAME
+    fieldPaths:
+    - spec.resources.requests.storage
+
+# ===== STORAGE CLASS =====
+- source:
+    kind: ConfigMap
+    name: storage-config
+    fieldPath: data.storage-class
+  targets:
+  - select:
+      kind: PersistentVolumeClaim
+    fieldPaths:
+    - spec.storageClassName
+
+# ===== INGRESS CONFIGURATION =====
+- source:
+    kind: ConfigMap
+    name: ingress-config
+    fieldPath: data.ingress-name
+  targets:
+  - select:
+      name: PLACEHOLDER_INGRESS_NAME
+    fieldPaths:
+    - metadata.name
+
+- source:
+    kind: ConfigMap
+    name: ingress-config
+    fieldPath: data.hostname
+  targets:
+  - select:
+      kind: Ingress
+    fieldPaths:
+    - spec.rules.[host=PLACEHOLDER_HOSTNAME].host
+    - spec.tls.[secretName=PLACEHOLDER_TLS_SECRET_NAME].hosts.[0]
+
+- source:
+    kind: ConfigMap
+    name: ingress-config
+    fieldPath: data.main-port
+  targets:
+  - select:
+      kind: Ingress
+    fieldPaths:
+    - spec.rules.[host=PLACEHOLDER_HOSTNAME].http.paths.[path=PLACEHOLDER_MAIN_PATH].backend.service.port.number
+
+- source:
+    kind: ConfigMap
+    name: ingress-config
+    fieldPath: data.longpolling-port
+  targets:
+  - select:
+      kind: Ingress
+    fieldPaths:
+    - spec.rules.[host=PLACEHOLDER_HOSTNAME].http.paths.[path=PLACEHOLDER_LONGPOLLING_PATH].backend.service.port.number
+
+# ===== DATABASE CLUSTER =====
+- source:
+    kind: ConfigMap
+    name: database-config
+    fieldPath: data.cluster-name
+  targets:
+  - select:
+      name: PLACEHOLDER_CLUSTER_NAME
+    fieldPaths:
+    - metadata.name
+
+- source:
+    kind: ConfigMap
+    name: database-config
+    fieldPath: data.instances
+  targets:
+  - select:
+      kind: Cluster
+    fieldPaths:
+    - spec.instances
+
+- source:
+    kind: ConfigMap
+    name: database-config
+    fieldPath: data.storage-size
+  targets:
+  - select:
+      kind: Cluster
+    fieldPaths:
+    - spec.storage.size
+
+# ===== ENVIRONMENT-SPECIFIC DEBUG =====
+- source:
+    kind: ConfigMap
+    name: environment-config
+    fieldPath: data.debug-mode
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.containers.[name=app-18-odoo].env.[name=DEBUG_MODE].value
+
+# ===== LABELS PROPAGATION =====
+- source:
+    kind: ConfigMap
+    name: app-config
+    fieldPath: data.app-name
+  targets:
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - metadata.labels.app
+    - spec.selector.matchLabels.app
+    - spec.template.metadata.labels.app
+  - select:
+      kind: Service
+    fieldPaths:
+    - metadata.labels.app
+    - spec.selector.app
+  - select:
+      kind: PersistentVolumeClaim
+    fieldPaths:
+    - metadata.labels.app

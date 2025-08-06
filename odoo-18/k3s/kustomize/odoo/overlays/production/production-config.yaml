@@ -1,0 +1,39 @@
+# production-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  replicas: "5"
+  cpu-limit: "32000m"
+  memory-limit: "64Gi"
+  cpu-request: "16000m"
+  memory-request: "32Gi"
+  image-tag: "enterprise-18.0"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-config
+data:
+  data-size: "100Gi"
+  external-size: "500Gi"
+  storage-size: "500Gi"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-config
+data:
+  debug-mode: "false"
+  enable-ssl: "true"
+  enable-monitoring: "true"
+  enable-backup: "true"
+  enable-hpa: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-config
+data:
+  hostname: "erp.enterprise.com"

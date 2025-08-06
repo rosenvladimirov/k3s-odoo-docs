@@ -1,0 +1,152 @@
+# 🌐 HYBRID CONFIG TEMPLATE - Environment Variables + Kustomize
+# Използва се с: envsubst < config-template.yaml > config.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: namespace-config
+data:
+  namespace: "${ODOO_NAMESPACE:-odoo-18}"
+  environment: "${DEPLOYMENT_ENV:-production}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  # Имена на ресурсите
+  config-map-name: "${CONFIG_MAP_NAME:-odoo-18-config-data}"
+  secret-name: "${SECRET_NAME:-contabo-creds-odoo-18}"
+  app-name: "${APP_NAME:-odoo-18-app}"
+  service-name: "${SERVICE_NAME:-app-odoo-18-service}"
+
+  # Конфигурации на приложението
+  image-repository: "${IMAGE_REPOSITORY:-vladimirovrosen/odoo}"
+  image-tag: "${IMAGE_TAG:-bookworm-18.0}"
+  supervisor-tag: "${SUPERVISOR_TAG:-supervisor-18.0}"
+
+  # Database конфигурации
+  db-host: "${DB_HOST:-odoo-db-rw}"
+  db-user: "${DB_USER:-odoo}"
+  db-password: "${DB_PASSWORD:-odoo18}"
+
+  # Resource configurations - Dynamic based on environment
+  cpu-limit: "${CPU_LIMIT:-8000m}"
+  memory-limit: "${MEMORY_LIMIT:-8Gi}"
+  cpu-request: "${CPU_REQUEST:-4000m}"
+  memory-request: "${MEMORY_REQUEST:-8Gi}"
+
+  # Replicas - Dynamic scaling
+  replicas: "${APP_REPLICAS:-1}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-config
+data:
+  # PVC имена
+  data-pvc: "${DATA_PVC_NAME:-odoo-18-data-pvc}"
+  opt-pvc: "${OPT_PVC_NAME:-odoo-18-opt-pvc}"
+  python3-pvc: "${PYTHON3_PVC_NAME:-odoo-18-python3-pvc}"
+  external-pvc: "${EXTERNAL_PVC_NAME:-odoo-18-external-pvc}"
+
+  # Storage размери - Dynamic based on environment
+  data-size: "${DATA_STORAGE_SIZE:-20Gi}"
+  opt-size: "${OPT_STORAGE_SIZE:-10Gi}"
+  python3-size: "${PYTHON3_STORAGE_SIZE:-5Gi}"
+  external-size: "${EXTERNAL_STORAGE_SIZE:-50Gi}"
+
+  # Storage class - Environment specific
+  storage-class: "${STORAGE_CLASS:-longhorn}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-config
+data:
+  # PostgreSQL Cluster конфигурация
+  cluster-name: "${DB_CLUSTER_NAME:-odoo-18-pg}"
+  instances: "${DB_INSTANCES:-2}"
+
+  # Database settings
+  database-name: "${DATABASE_NAME:-odoo}"
+  admin-user: "${DB_ADMIN_USER:-rosen.vladimirov}"
+  app-user: "${DB_APP_USER:-odoo}"
+
+  # Secret имена
+  admin-secret: "${DB_ADMIN_SECRET:-odoo-pg-rosen-vladimirov}"
+  app-secret: "${DB_APP_SECRET:-odoo-pg-odoo}"
+
+  # Storage конфигурация - Dynamic
+  storage-size: "${DB_STORAGE_SIZE:-64Gi}"
+  storage-class: "${DB_STORAGE_CLASS:-longhorn}"
+
+  # Resource конфигурация - Environment based
+  db-cpu-limit: "${DB_CPU_LIMIT:-8000m}"
+  db-memory-limit: "${DB_MEMORY_LIMIT:-28Gi}"
+  db-cpu-request: "${DB_CPU_REQUEST:-6000m}"
+  db-memory-request: "${DB_MEMORY_REQUEST:-22Gi}"
+
+  # Backup конфигурация
+  backup-bucket: "${BACKUP_BUCKET:-s3://odoo/}"
+  backup-endpoint: "${BACKUP_ENDPOINT:-https://eu2.contabostorage.com/}"
+
+  # PostgreSQL параметри - Dynamic tuning
+  shared-buffers: "${PG_SHARED_BUFFERS:-512MB}"
+  max-connections: "${PG_MAX_CONNECTIONS:-200}"
+  work-mem: "${PG_WORK_MEM:-4MB}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-config
+data:
+  # Ingress имена и настройки
+  ingress-name: "${INGRESS_NAME:-odoo-18}"
+  ingress-app-label: "${INGRESS_APP_LABEL:-odoo-18}"
+
+  # SSL/TLS конфигурация
+  cert-issuer: "${CERT_ISSUER:-letsencrypt-production}"
+  tls-secret-name: "${TLS_SECRET_NAME:-erp-odoo-shell-dev-tls}"
+
+  # Domain конфигурация - Environment specific
+  hostname: "${ODOO_HOSTNAME:-erp.odoo-shell.dev}"
+
+  # Service референции
+  backend-service-name: "${BACKEND_SERVICE_NAME:-odoo-18-service}"
+
+  # Port конфигурация
+  main-port: "${MAIN_PORT:-8069}"
+  longpolling-port: "${LONGPOLLING_PORT:-8072}"
+
+  # Path конфигурация
+  main-path: "${MAIN_PATH:-/}"
+  longpolling-path: "${LONGPOLLING_PATH:-/longpolling}"
+  path-type: "${PATH_TYPE:-Prefix}"
+
+  # Environment specific ingress class
+  ingress-class: "${INGRESS_CLASS:-traefik}"
+---
+# 🌐 NEW: Environment-specific config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-config
+data:
+  # Environment identification
+  env-name: "${DEPLOYMENT_ENV:-production}"
+  env-tier: "${ENV_TIER:-prod}"
+
+  # Scaling configuration
+  enable-hpa: "${ENABLE_HPA:-false}"
+  min-replicas: "${MIN_REPLICAS:-1}"
+  max-replicas: "${MAX_REPLICAS:-10}"
+
+  # Feature toggles
+  enable-ssl: "${ENABLE_SSL:-true}"
+  enable-monitoring: "${ENABLE_MONITORING:-true}"
+  enable-backup: "${ENABLE_BACKUP:-true}"
+
+  # Debug settings
+  debug-mode: "${DEBUG_MODE:-false}"
+  log-level: "${LOG_LEVEL:-INFO}"

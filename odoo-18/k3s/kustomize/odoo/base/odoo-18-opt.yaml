@@ -1,0 +1,15 @@
+# 🔧 OPT Volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: PLACEHOLDER_OPT_PVC_NAME
+  labels:
+    app: PLACEHOLDER_APP_LABEL
+    volume-type: opt
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: PLACEHOLDER_OPT_SIZE
+  storageClassName: PLACEHOLDER_STORAGE_CLASS

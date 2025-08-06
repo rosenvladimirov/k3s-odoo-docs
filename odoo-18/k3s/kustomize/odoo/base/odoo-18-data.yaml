@@ -1,0 +1,16 @@
+# 💾 HYBRID PVC TEMPLATE - Data Volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: PLACEHOLDER_DATA_PVC_NAME
+  labels:
+    app: PLACEHOLDER_APP_LABEL
+    volume-type: data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: PLACEHOLDER_DATA_SIZE
+  storageClassName: PLACEHOLDER_STORAGE_CLASS
+

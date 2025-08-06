@@ -1,0 +1,27 @@
+# development-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  replicas: "1"
+  cpu-limit: "2000m"
+  memory-limit: "4Gi"
+  cpu-request: "1000m"
+  memory-request: "2Gi"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-config
+data:
+  debug-mode: "true"
+  enable-ssl: "false"
+  log-level: "DEBUG"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-config
+data:
+  hostname: "odoo-dev.local"

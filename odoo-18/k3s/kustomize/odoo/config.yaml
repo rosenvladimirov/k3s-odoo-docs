@@ -1,0 +1,148 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: namespace-config
+data:
+  namespace: "odoo-18"
+  environment: "production"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  # Имена на ресурсите
+  config-map-name: "odoo-18-config-data"
+  secret-name: "contabo-creds-odoo-18"
+  app-name: "odoo-18-app"
+  service-name: "app-odoo-18-service"
+
+  # Конфигурации на приложението
+  image-repository: "vladimirovrosen/odoo"
+  image-tag: "bookworm-18.0"
+  supervisor-tag: "supervisor-18.0"
+
+  # Database конфигурации
+  db-host: "odoo-db-rw"
+  db-user: "odoo"
+  db-password: "odoo18"
+
+  # Resource configurations
+  cpu-limit: "8000m"
+  memory-limit: "8Gi"
+  cpu-request: "4000m"
+  memory-request: "8Gi"
+
+  # Replicas
+  replicas: "1"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-config
+data:
+  # PVC имена
+  data-pvc: "odoo-18-data-pvc"
+  opt-pvc: "odoo-18-opt-pvc"
+  python3-pvc: "odoo-18-python3-pvc"
+  external-pvc: "odoo-18-external-pvc"
+
+  # Storage размери
+  data-size: "20Gi"
+  opt-size: "10Gi"
+  python3-size: "5Gi"
+  external-size: "50Gi"
+
+  # Storage class
+  storage-class: "longhorn"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-config
+data:
+  # PostgreSQL Cluster конфигурация
+  cluster-name: "odoo-18-pg"
+  instances: "2"
+
+  # Database settings
+  database-name: "odoo"
+  admin-user: "rosen.vladimirov"
+  app-user: "odoo"
+
+  # Secret имена
+  admin-secret: "odoo-pg-rosen-vladimirov"
+  app-secret: "odoo-pg-odoo"
+
+  # Storage конфигурация
+  storage-size: "64Gi"
+  storage-class: "longhorn"
+
+  # Resource конфигурация
+  db-cpu-limit: "8000m"
+  db-memory-limit: "28Gi"
+  db-cpu-request: "6000m"
+  db-memory-request: "22Gi"
+
+  # Backup конфигурация
+  backup-bucket: "s3://odoo/"
+  backup-endpoint: "https://eu2.contabostorage.com/"
+
+  # PostgreSQL параметри
+  shared-buffers: "512MB"
+  max-connections: "200"
+  work-mem: "4MB"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-config
+data:
+  # Ingress имена и настройки
+  ingress-name: "odoo-18"
+  ingress-app-label: "odoo-18"
+
+  # SSL/TLS конфигурация
+  cert-issuer: "letsencrypt-production"
+  tls-secret-name: "erp-odoo-shell-dev-tls"
+
+  # Domain конфигурация
+  hostname: "erp.odoo-shell.dev"
+
+  # Service референции
+  backend-service-name: "odoo-18-service"
+
+  # Port конфигурация
+  main-port: "8069"
+  longpolling-port: "8072"
+
+  # Path конфигурация
+  main-path: "/"
+  longpolling-path: "/longpolling"
+  path-type: "Prefix"
+
+  # Ingress class
+  ingress-class: "traefik"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-config
+data:
+  # Environment identification
+  env-name: "production"
+  env-tier: "prod"
+
+  # Scaling configuration
+  enable-hpa: "false"
+  min-replicas: "1"
+  max-replicas: "10"
+
+  # Feature toggles
+  enable-ssl: "true"
+  enable-monitoring: "true"
+  enable-backup: "true"
+
+  # Debug settings
+  debug-mode: "false"
+  log-level: "INFO"

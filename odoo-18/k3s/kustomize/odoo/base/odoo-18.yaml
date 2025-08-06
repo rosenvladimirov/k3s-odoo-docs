@@ -1,0 +1,139 @@
+# 🚀 HYBRID ODOO 18 DEPLOYMENT - PLACEHOLDER_* will be replaced by Kustomize
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: PLACEHOLDER_APP_NAME
+  labels:
+    app: PLACEHOLDER_APP_LABEL
+spec:
+  replicas: PLACEHOLDER_REPLICAS
+  selector:
+    matchLabels:
+      app: PLACEHOLDER_APP_LABEL
+  template:
+    metadata:
+      labels:
+        app: PLACEHOLDER_APP_LABEL
+        version: PLACEHOLDER_IMAGE_TAG
+        environment: PLACEHOLDER_ENVIRONMENT
+    spec:
+      containers:
+      - name: app-18-odoo
+        image: PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_IMAGE_TAG
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8069
+          name: http
+        - containerPort: 8072
+          name: longpolling
+        resources:
+          limits:
+            cpu: PLACEHOLDER_CPU_LIMIT
+            memory: PLACEHOLDER_MEMORY_LIMIT
+          requests:
+            cpu: PLACEHOLDER_CPU_REQUEST
+            memory: PLACEHOLDER_MEMORY_REQUEST
+        env:
+        - name: HOST
+          value: PLACEHOLDER_DB_HOST
+        - name: USER
+          value: PLACEHOLDER_DB_USER
+        - name: PASSWORD
+          value: PLACEHOLDER_DB_PASSWORD
+        - name: DEPLOYMENT_ENV
+          value: PLACEHOLDER_ENVIRONMENT
+        - name: DEBUG_MODE
+          value: PLACEHOLDER_DEBUG_MODE
+        volumeMounts:
+        - mountPath: /var/lib/odoo
+          name: data
+        - mountPath: /mnt/extra-addons
+          name: mnt
+        - mountPath: /opt/odoo
+          name: opt
+        - mountPath: /opt/python3
+          name: python3
+        - mountPath: /etc/odoo/odoo.conf
+          name: conf
+          subPath: odoo.conf
+        - mountPath: /etc/odoo/addons.conf
+          name: conf-addons
+          subPath: addons.conf
+        # ✅ Health checks
+        livenessProbe:
+          httpGet:
+            path: /web/health
+            port: 8069
+          initialDelaySeconds: 300
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /web/health
+            port: 8069
+          initialDelaySeconds: 60
+          periodSeconds: 10
+      initContainers:
+      - name: supervisor-odoo
+        image: PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_SUPERVISOR_TAG
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: PLACEHOLDER_CPU_LIMIT
+            memory: PLACEHOLDER_MEMORY_LIMIT
+          requests:
+            cpu: PLACEHOLDER_CPU_REQUEST
+            memory: PLACEHOLDER_MEMORY_REQUEST
+        securityContext:
+          runAsUser: 0
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/odoo
+          name: data
+        - mountPath: /opt/odoo
+          name: opt
+        - mountPath: /opt/python3
+          name: python3
+        - mountPath: /etc/odoo/addons.conf
+          name: conf-addons
+          subPath: addons.conf
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: PLACEHOLDER_DATA_PVC
+      - name: opt
+        persistentVolumeClaim:
+          claimName: PLACEHOLDER_OPT_PVC
+      - name: python3
+        persistentVolumeClaim:
+          claimName: PLACEHOLDER_PYTHON3_PVC
+      - name: mnt
+        persistentVolumeClaim:
+          claimName: PLACEHOLDER_EXTERNAL_PVC
+      - name: conf
+        configMap:
+          name: PLACEHOLDER_CONFIG_MAP_NAME
+      - name: conf-addons
+        configMap:
+          name: PLACEHOLDER_CONFIG_MAP_NAME
+---
+# 🌐 HYBRID SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: PLACEHOLDER_SERVICE_NAME
+  labels:
+    app: PLACEHOLDER_APP_LABEL
+spec:
+  type: ClusterIP
+  selector:
+    app: PLACEHOLDER_APP_LABEL
+  ports:
+  - name: app-18-odoo-service-base
+    port: 8069
+    targetPort: 8069
+  - name: app-18-odoo-service-ssl
+    port: 8071
+    targetPort: 8071
+  - name: app-18-odoo-service-im
+    port: 8072
+    targetPort: 8072
