@@ -3,18 +3,25 @@ name: 📚 Deploy K3s-Odoo Documentation
 on:
   push:
     branches: [ main ]
-    paths: [ '**.md', 'assets/**' ]
+    paths: [ '**.md', 'assets/**', 'docs/**' ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
     name: 🚀 Deploy to GitHub Pages
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
     - name: 📁 Checkout
@@ -22,26 +29,33 @@ jobs:
 
     - name: 📝 Setup Static Files
       run: |
+        # Създай основна структура
+        mkdir -p _site
+        
+        # Копирай всички markdown файлове
+        cp -r . _site/
+        
         # Създай CNAME за custom domain
-        echo "docs.odoo-shell.dev" > CNAME
+        echo "docs.odoo-shell.dev" > _site/CNAME
         
         # Деактивирай Jekyll
-        touch .nojekyll
+        touch _site/.nojekyll
         
         # Създай robots.txt
-        cat > robots.txt << EOF
+        cat > _site/robots.txt << EOF
         User-agent: *
         Allow: /
         Sitemap: https://docs.odoo-shell.dev/sitemap.xml
         EOF
 
-    - name: 🚀 Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: 📦 Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: 📋 Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: .
-        cname: docs.odoo-shell.dev
-        user_name: 'github-actions[bot]'
-        user_email: 'github-actions[bot]@users.noreply.github.com'
-        commit_message: 'docs: update documentation'
-        enable_jekyll: false
+        path: '_site'
+
+    - name: 🚀 Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
