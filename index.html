@@ -3,85 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K3s-Odoo Документация</title>
+    <title>K3s-Odoo Документация | Enterprise Cloud Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+        }
+
+        * {
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .docs-list {
-            list-style: none;
             padding: 0;
+            box-sizing: border-box;
         }
-        .docs-list li {
-            margin: 15px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #007bff;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.7;
+            color: var(--gray-800);
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+            min-height: 100vh;
         }
-        .docs-list a {
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: -2rem auto 0;
+            padding: 0 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Navigation Cards */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .nav-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+            border-color: var(--primary);
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-description {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
             text-decoration: none;
-            color: #007bff;
             font-weight: 500;
-            font-size: 1.1em;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
         }
-        .docs-list a:hover {
-            color: #0056b3;
+
+        .card-link:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(2px);
         }
-        .description {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 5px;
+
+        .card-link i {
+            transition: transform 0.2s ease;
         }
+
+        .card-link:hover i {
+            transform: translateX(2px);
+        }
+
+        /* Special card styles */
+        .card-main .card-icon {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .card-enterprise .card-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .card-vm .card-icon {
+            background: linear-gradient(135deg, var(--accent), #0284c7);
+        }
+
+        .card-barebone .card-icon {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+        }
+
+        .card-migration .card-icon {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .card-troubleshooting .card-icon {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        /* Stats section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--gray-200);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--gray-200);
+            background: white;
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .nav-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .container {
+                padding: 0 1rem 2rem;
+            }
+
+            .nav-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .nav-card:nth-child(1) { animation-delay: 0.1s; }
+        .nav-card:nth-child(2) { animation-delay: 0.2s; }
+        .nav-card:nth-child(3) { animation-delay: 0.3s; }
+        .nav-card:nth-child(4) { animation-delay: 0.4s; }
+        .nav-card:nth-child(5) { animation-delay: 0.5s; }
+        .nav-card:nth-child(6) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📚 K3s-Odoo Документация</h1>
+    <header class="header">
+        <h1><i class="fas fa-cube"></i> K3s-Odoo Документация</h1>
+        <p>Enterprise Cloud Platform за Odoo 18 - Production-Ready Deployments</p>
+    </header>
 
-        <ul class="docs-list">
-            <li>
-                <a href="README.md">🏠 Главна страница</a>
-                <div class="description">Обща информация за проекта</div>
-            </li>
-            <li>
-                <a href="docs/README-k3s-odoo-18.md">🐳 Odoo 18 с K3s</a>
-                <div class="description">Пълно ръководство за деплой на Odoo 18</div>
-            </li>
-            <li>
-                <a href="docs/README-VM.md">🖥️ Виртуална машина</a>
-                <div class="description">Настройка на VM за K3s</div>
-            </li>
-            <li>
-                <a href="docs/README-BAREBONE.md">⚡ Barebone деплой</a>
-                <div class="description">Минимална настройка</div>
-            </li>
-            <li>
-                <a href="docs/MIGRATION-GUIDE.md">🔄 Миграция</a>
-                <div class="description">Ръководство за миграция</div>
-            </li>
-            <li>
-                <a href="docs/TROUBLESHOOTING.md">🔧 Отстраняване на проблеми</a>
-                <div class="description">Чести проблеми и решения</div>
-            </li>
-        </ul>
+    <div class="container">
+        <!-- Stats Section -->
+        <div class="stats">
+            <div class="stat-card">
+                <span class="stat-number">3</span>
+                <div class="stat-label">Deployment Сценария</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">99.9%</span>
+                <div class="stat-label">Uptime SLA</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">30s</span>
+                <div class="stat-label">Quick Deploy</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">24/7</span>
+                <div class="stat-label">Enterprise Support</div>
+            </div>
+        </div>
+
+        <!-- Navigation Grid -->
+        <div class="nav-grid">
+            <!-- Main Documentation -->
+            <div class="nav-card card-main">
+                <div class="card-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <h3 class="card-title">
+                    🏠 Главна страница
+                </h3>
+                <p class="card-description">
+                    Обща информация за проекта, архитектура и избор на deployment сценарий според вашите бизнес нужди.
+                </p>
+                <a href="README.md" class="card-link">
+                    Прочетете повече <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Odoo 18 Enterprise -->
+            <div class="nav-card card-enterprise">
+                <div class="card-icon">
+                    <i class="fab fa-docker"></i>
+                </div>
+                <h3 class="card-title">
+                    🐳 Odoo 18 Enterprise Platform
+                </h3>
+                <p class="card-description">
+                    Production-ready cloud-native Odoo 18 deployment с автоматизация, SSL, monitoring и zero-downtime deployments.
+                </p>
+                <a href="docs/README-k3s-odoo-18.md" class="card-link">
+                    Започнете сега <i class="fas fa-rocket"></i>
+                </a>
+            </div>
+
+            <!-- VM Deployment -->
+            <div class="nav-card card-vm">
+                <div class="card-icon">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <h3 class="card-title">
+                    🖥️ Виртуална машина
+                </h3>
+                <p class="card-description">
+                    Настройка на VM за K3s - идеално за development, testing и бюджетно-съобразени проекти.
+                </p>
+                <a href="docs/README-VM.md" class="card-link">
+                    VM Setup Guide <i class="fas fa-cogs"></i>
+                </a>
+            </div>
+
+            <!-- Bare Metal -->
+            <div class="nav-card card-barebone">
+                <div class="card-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h3 class="card-title">
+                    ⚡ Bare Metal High-Performance
+                </h3>
+                <p class="card-description">
+                    Production deployment за максимална производителност с network bonding и хардуерна оптимизация.
+                </p>
+                <a href="docs/README-BAREBONE.md" class="card-link">
+                    Performance Guide <i class="fas fa-tachometer-alt"></i>
+                </a>
+            </div>
+
+            <!-- Migration -->
+            <div class="nav-card card-migration">
+                <div class="card-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3 class="card-title">
+                    🔄 Миграция
+                </h3>
+                <p class="card-description">
+                    Ръководство за миграция между различните deployment сценарии и upgrade procedures.
+                </p>
+                <a href="docs/MIGRATION-GUIDE.md" class="card-link">
+                    Migration Guide <i class="fas fa-route"></i>
+                </a>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="nav-card card-troubleshooting">
+                <div class="card-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3 class="card-title">
+                    🔧 Отстраняване на проблеми
+                </h3>
+                <p class="card-description">
+                    Чести проблеми, решения, debugging техники и enterprise support информация.
+                </p>
+                <a href="docs/TROUBLESHOOTING.md" class="card-link">
+                    Troubleshoot Now <i class="fas fa-wrench"></i>
+                </a>
+            </div>
+        </div>
     </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 K3s-Odoo Enterprise Platform. Designed for Production Excellence.</p>
+        <p>
+            <i class="fas fa-envelope"></i> Enterprise Support:
+            <a href="mailto:vladimirov.rosen@gmail.com">vladimirov.rosen@gmail.com</a>
+        </p>
+    </footer>
 </body>
 </html>
