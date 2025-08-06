@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="style.css">
+
 # 🚀 **Odoo 18 K3s Deployment Platform**
 
 **Production-ready cloud-native Odoo 18 ERP** с **хибриден Kustomize конфигурационен подход** за максимална гъвкавост и автоматизация.
@@ -11,11 +13,15 @@
 ### ✨ **Защо е различен?**
 - **🎯 Zero-downtime deployments** - Плавни обновления без прекъсвания
 - **🔄 Multi-environment готовност** - Един код за всички среди
-- **⚡ Автоматизиран build процес** - Един скрипт за всичко
+- **⚡ Автоматизиран build процес** - Один скрипт за всичко
 - **🏢 Enterprise security** - Built-in SSL, monitoring, backup
 - **📈 Scalable design** - От 1 до 100+ потребители
 
 ---
+
+<div class="alert alert-info">
+<strong>💡 Quick Start:</strong> За пълно deployment до 5 минути използвайте автоматизирания build.sh скрипт!
+</div>
 
 ## 🚀 **Бързо стартиране**
 
@@ -40,9 +46,13 @@ export ENABLE_MONITORING="true"
 ```
 
 
-**Готово!** 🎉 Вашият Odoo 18 е готов на:
-- **Development**: `http://odoo-dev.local:8069`
-- **Production**: `https://erp.yourcompany.com`
+<div class="alert alert-success">
+<strong>✅ Готово!</strong> 🎉 Вашият Odoo 18 е готов на:
+<ul>
+<li><strong>Development:</strong> <code>http://odoo-dev.local:8069</code></li>
+<li><strong>Production:</strong> <code>https://erp.yourcompany.com</code></li>
+</ul>
+</div>
 
 ---
 
@@ -51,6 +61,7 @@ export ENABLE_MONITORING="true"
 ### Основни команди
 ```shell script
 cd odoo-18-k3s/odoo-18/k3s/kustomize/odoo
+
 # Deploy към различни среди
 ./build.sh development    # За разработка
 ./build.sh staging       # За тестване
@@ -81,6 +92,10 @@ ENABLE_BACKUP="true" \
 
 ## 🌍 **Multi-Environment архитектура**
 
+<div class="breadcrumb">
+🏠 Home → 🔧 Configuration → 🌍 Multi-Environment
+</div>
+
 | **Environment** | **Характеристики** | **Когато да използвате** |
 |----------------|-------------------|-------------------------|
 | **Development** | Минимални ресурси, debug режим | Разработка, тестване на функции |
@@ -88,28 +103,39 @@ ENABLE_BACKUP="true" \
 | **Production** | Максимални ресурси, пълен мониторинг | Live система за крайни потребители |
 
 ### Автоматични defaults по среда:
-```shell script
+```yaml
 # Development - бързо и лесно
-- 1 replica, 2CPU, 4GB RAM
-- Debug: включен
-- SSL: изключен
+replicas: 1
+cpu: "2000m" 
+memory: "4Gi"
+debug: enabled
+ssl: disabled
 
 # Staging - близо до production
-- 2 replicas, 4CPU, 8GB RAM  
-- Debug: изключен
-- SSL: включен
+replicas: 2
+cpu: "4000m"
+memory: "8Gi"
+debug: disabled
+ssl: enabled
 
 # Production - максимална производителност
-- 3+ replicas, 16CPU, 32GB RAM
-- Debug: изключен
-- SSL: задължителен
-- Мониторинг и backup включени
+replicas: 3+
+cpu: "16000m"
+memory: "32Gi"
+debug: disabled
+ssl: required
+monitoring: enabled
+backup: enabled
 ```
 
 
 ---
 
 ## ⚙️ **Advanced Configuration**
+
+<div class="alert alert-warning">
+<strong>⚠️ Внимание:</strong> Advanced настройките изискват добро познание на Kubernetes и Kustomize.
+</div>
 
 ### Custom Environment Files
 Създайте `.env` файлове за различни deployments:
@@ -227,6 +253,10 @@ kubectl apply -f backup-restore-job.yaml
 
 ## 🎯 **Production Checklist**
 
+<div class="alert alert-danger">
+<strong>🚨 Важно:</strong> Проверете всички точки преди production deployment!
+</div>
+
 Преди production deployment, уверете се че:
 
 - [ ] **DNS records** са настроени за вашия hostname
@@ -277,6 +307,8 @@ kubectl apply -f backup-restore-job.yaml
 
 ---
 
-**🚀 Ready за production Odoo 18?** Започнете с `./build.sh development` и се гответе за enterprise-grade ERP система! ⚡
+<div class="alert alert-success">
+<strong>🚀 Ready за production Odoo 18?</strong> Започнете с <code>./build.sh development</code> и се гответе за enterprise-grade ERP система! ⚡
+</div>
 
 *Cloud-native • Production-ready • Enterprise-focused* 🏢✨

@@ -1,18 +1,20 @@
----
-layout: default
-title: "Миграционно Ръководство"
-nav_order: 4
----
+<link rel="stylesheet" href="style.css">
 
 # 🔄 Ръководство за Миграция - Odoo-18 K3s Платформа
 
 **Пълно ръководство за миграция между Bare Metal и VM разгръщане сценарии**
+
+---
 
 ## 🎯 Преглед
 
 Това ръководство описва как да **мигрирате безопасно** между различните разгръщане сценарии на Odoo-18 K3s Платформа. Поддържаме **двупосочна миграция** с минимално спиране на услугите и запазване на данните.
 
 ---
+
+<div class="alert alert-info">
+<strong>💡 Преди да започнете:</strong> Уверете се, че имате пълен backup на всички данни и конфигурации преди стартиране на процеса на миграция!
+</div>
 
 ## 📋 Поддържани Миграционни Пътища
 
@@ -28,6 +30,10 @@ nav_order: 4
 ---
 
 ## 🚀 Миграция: ВМ към Bare Metal
+
+<div class="breadcrumb">
+🏠 Home → 🔄 Migration → 🏭 VM to Bare Metal
+</div>
 
 > **Сценарий:** Повишаване от разработка/тестване към производствена среда
 
@@ -57,6 +63,10 @@ kubectl get secrets --all-namespaces -o yaml > migration-backup/vm-config/secret
 kubectl get pv -o yaml > migration-backup/vm-config/persistent-volumes.yaml
 ```
 ### 🔧 **Стъпка 1: Архивиране на Данни**
+
+<div class="alert alert-warning">
+<strong>⚠️ Важно:</strong> Този процес ще спре всички приложения временно за гарантиране на консистентност на данните.
+</div>
 
 #### **Архивиране на Клъстер Данни**
 ```
@@ -225,6 +235,10 @@ kubectl get pvc --all-namespaces
 ```
 ### ✅ **Стъпка 4: Валидация и Тестване**
 
+<div class="alert alert-success">
+<strong>✅ Валидация:</strong> Използвайте тези команди за проверка на успешна миграция
+</div>
+
 #### **Функционален Тест**
 ```
 bash
@@ -276,6 +290,10 @@ kubectl exec -it network-test -- iperf3 -c localhost -t 30
 ---
 
 ## 🖥️ Миграция: Bare Metal към ВМ
+
+<div class="breadcrumb">
+🏠 Home → 🔄 Migration → 🖥️ Bare Metal to VM
+</div>
 
 > **Сценарий:** Понижаване към разработка/тестване или временно решение
 
@@ -368,6 +386,10 @@ kubectl apply -f migration-backup/bare-metal-config/
 ## 🔧 Миграционни Помощни Програми
 
 ### 📱 **Помощни Скриптове за Миграция**
+
+<div class="alert alert-info">
+<strong>💡 Съвет:</strong> Използвайте тези помощни скриптове за автоматизиране на миграционния процес
+</div>
 
 #### **Скрипт за Проверка на Миграция**
 ```
@@ -530,6 +552,10 @@ echo "🏁 Мониторингът на миграцията завърши"
 
 ### ❌ **Общи Проблеми**
 
+<div class="alert alert-danger">
+<strong>🚨 Внимание:</strong> При възникване на проблеми, винаги имайте готов план за възвръщане!
+</div>
+
 #### **Проблем: Проблеми с Мрежовата Свързаност**
 ```
 bash
@@ -546,8 +572,7 @@ kubectl rollout restart daemonset/traefik -n kube-system
 kubectl rollout restart deployment/coredns -n kube-system
 ```
 #### **Проблем: Неуспешно Монтиране на Съхранението**
-```
-bash
+```bash
 # Симптоми: Заявките за постоянни томове остават в състояние на чакане
 # Решение:
 kubectl describe pvc problematic-pvc
@@ -559,9 +584,11 @@ kubectl logs -n longhorn-system -l app=longhorn-manager
 # Ръчно прикачи томове
 kubectl patch pv pv-name -p '{"spec":{"claimRef":null}}'
 ```
-#### **Проблем: Ограничения на Ресурсите**
 ```
-bash
+
+
+#### **Проблем: Ограничения на Ресурсите**
+```shell script
 # Симптоми: Подове в състояние на чакане поради недостатъчни ресурси
 # Решение:
 kubectl describe nodes
@@ -571,17 +598,18 @@ kubectl top pods --all-namespaces
 # Намали заявките за ресурси
 kubectl patch deployment app-name -p '{"spec":{"template":{"spec":{"containers":[{"name":"container-name","resources":{"requests":{"cpu":"50m","memory":"128Mi"}}}]}}}}'
 ```
+
+
 ### 🔧 **Специфични за Миграция Проблеми**
 
 #### **Проблем: Непълно Прехвърляне на Данни**
-```bash
+```shell script
 # Проверка за липсващи данни
 find /var/lib/longhorn -name "*.img" -size 0
 kubectl get pv | grep Available
 
 # Повтори прехвърлянето на данни
 rsync -avP --partial source-dir/ dest-dir/
-```
 ```
 
 
@@ -600,6 +628,10 @@ kubectl rollout restart deployment/coredns -n kube-system
 ## 📋 Списък за Проверка на Миграция
 
 ### ✅ **Списък за Проверка Преди Миграция**
+
+<div class="alert alert-warning">
+<strong>⚠️ Предварителна подготовка:</strong> Завършете всички точки преди започване на миграцията
+</div>
 
 - [ ] **📊 Планиране на Ресурси**
   - [ ] Изчислени изисквания за ресурси
@@ -640,6 +672,10 @@ kubectl rollout restart deployment/coredns -n kube-system
 
 ### ✅ **Списък за Проверка След Миграция**
 
+<div class="alert alert-success">
+<strong>✅ Финална валидация:</strong> Уверете се, че всички системи работят правилно преди деклариране на успешна миграция
+</div>
+
 - [ ] **✅ Фаза на Валидация**
   - [ ] Всички възли са готови
   - [ ] Всички подове работят
@@ -665,6 +701,10 @@ kubectl rollout restart deployment/coredns -n kube-system
 
 ### 🆘 **Помощ за Миграция**
 
+<div class="alert alert-info">
+<strong>💬 24/7 Поддръжка:</strong> Нашият екип е готов да помогне във всяка стъпка от миграционния процес
+</div>
+
 За помощ с миграцията:
 - 📧 **Имейл**: vladimirov.rosen@gmail.com
 - 📱 **Спешност**: +359-886-100-204
@@ -679,6 +719,10 @@ kubectl rollout restart deployment/coredns -n kube-system
 - **[📖 Най-добри Практики](best-practices/)** - Препоръчителни практики
 
 ---
+
+<div class="alert alert-success">
+<strong>🚀 Готови за миграция?</strong> Следвайте стъпките внимателно и не се колебайте да се свържете с нашия екип за помощ! ⚡🎯
+</div>
 
 **Безопасна Миграция. Непрекъсната Услуга. Оптимизирана Производителност.** 🚀🔄
 

@@ -1,0 +1,366 @@
+/* GitHub Pages Compatible CSS for Markdown */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #0ea5e9;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+}
+
+/* Reset and base styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    line-height: 1.7 !important;
+    color: var(--gray-800) !important;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh;
+}
+
+/* Container for markdown content */
+.markdown-body,
+.container,
+article {
+    max-width: 900px !important;
+    margin: 2rem auto !important;
+    background: white !important;
+    padding: 3rem !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+    border: 1px solid var(--gray-200) !important;
+}
+
+/* Headers */
+h1 {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    margin: 0 0 2rem 0 !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+}
+
+h2 {
+    color: var(--gray-900) !important;
+    font-size: 1.8rem !important;
+    font-weight: 600 !important;
+    margin: 3rem 0 1.5rem 0 !important;
+    padding-bottom: 0.8rem !important;
+    border-bottom: 3px solid var(--primary) !important;
+    position: relative !important;
+}
+
+h2::before {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -3px !important;
+    left: 0 !important;
+    width: 60px !important;
+    height: 3px !important;
+    background: var(--info) !important;
+}
+
+h3 {
+    color: var(--primary) !important;
+    font-size: 1.4rem !important;
+    font-weight: 600 !important;
+    margin: 2rem 0 1rem 0 !important;
+}
+
+h4 {
+    color: var(--gray-700) !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    margin: 1.5rem 0 0.8rem 0 !important;
+}
+
+h5, h6 {
+    color: var(--gray-700) !important;
+    font-weight: 500 !important;
+    margin: 1rem 0 0.5rem 0 !important;
+}
+
+/* Paragraphs */
+p {
+    margin: 1rem 0 !important;
+    line-height: 1.7 !important;
+}
+
+/* Code blocks */
+pre {
+    background: var(--gray-900) !important;
+    color: #e2e8f0 !important;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    overflow-x: auto !important;
+    border: 1px solid #374151 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    margin: 1.5rem 0 !important;
+    font-family: 'Fira Code', 'Monaco', monospace !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+}
+
+code {
+    background: var(--gray-100) !important;
+    color: var(--primary) !important;
+    padding: 0.3rem 0.6rem !important;
+    border-radius: 4px !important;
+    font-size: 0.9em !important;
+    font-weight: 500 !important;
+    font-family: 'Fira Code', 'Monaco', monospace !important;
+}
+
+pre code {
+    background: transparent !important;
+    color: inherit !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+/* Tables */
+table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 2rem 0 !important;
+    background: white !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+    border: 1px solid var(--gray-200) !important;
+}
+
+th {
+    background: var(--primary) !important;
+    color: white !important;
+    padding: 1rem !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    font-size: 0.95rem !important;
+}
+
+td {
+    padding: 1rem !important;
+    border-bottom: 1px solid var(--gray-200) !important;
+    vertical-align: top !important;
+}
+
+tr:nth-child(even) td {
+    background: var(--gray-50) !important;
+}
+
+tr:hover td {
+    background: #f0f9ff !important;
+}
+
+/* Lists */
+ul, ol {
+    padding-left: 1.5rem !important;
+    margin: 1rem 0 !important;
+}
+
+li {
+    margin: 0.5rem 0 !important;
+    line-height: 1.6 !important;
+}
+
+li::marker {
+    color: var(--primary) !important;
+}
+
+ul li::marker {
+    content: "▸ " !important;
+}
+
+/* Links */
+a {
+    color: var(--primary) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    border-bottom: 1px solid transparent !important;
+    transition: all 0.2s ease !important;
+}
+
+a:hover {
+    color: var(--primary-dark) !important;
+    border-bottom-color: var(--primary) !important;
+}
+
+/* Blockquotes */
+blockquote {
+    background: linear-gradient(90deg, var(--primary), transparent) !important;
+    border-left: 4px solid var(--primary) !important;
+    padding: 1.5rem 2rem !important;
+    margin: 2rem 0 !important;
+    background-color: #f0f9ff !important;
+    border-radius: 8px !important;
+    font-style: italic !important;
+    position: relative !important;
+}
+
+blockquote::before {
+    content: '"' !important;
+    font-size: 4rem !important;
+    color: var(--primary) !important;
+    position: absolute !important;
+    top: -10px !important;
+    left: 20px !important;
+    font-family: serif !important;
+    opacity: 0.3 !important;
+}
+
+/* Horizontal rules */
+hr {
+    border: none !important;
+    height: 3px !important;
+    background: linear-gradient(90deg, var(--primary), var(--info), transparent) !important;
+    margin: 3rem 0 !important;
+    border-radius: 2px !important;
+}
+
+/* Images */
+img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    margin: 1rem 0 !important;
+}
+
+/* Badges (for shields.io style) */
+img[src*="shield"],
+img[src*="badge"] {
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    margin: 0.2rem !important;
+    display: inline-block !important;
+}
+
+/* Alert boxes using div with classes */
+.alert {
+    padding: 1rem 1.5rem !important;
+    border-radius: 8px !important;
+    margin: 1.5rem 0 !important;
+    border-left: 4px solid !important;
+}
+
+.alert-info {
+    background: #f0f9ff !important;
+    border-left-color: var(--info) !important;
+    color: #0c4a6e !important;
+}
+
+.alert-success {
+    background: #f0fdf4 !important;
+    border-left-color: var(--success) !important;
+    color: #14532d !important;
+}
+
+.alert-warning {
+    background: #fffbeb !important;
+    border-left-color: var(--warning) !important;
+    color: #92400e !important;
+}
+
+.alert-danger {
+    background: #fef2f2 !important;
+    border-left-color: var(--danger) !important;
+    color: #991b1b !important;
+}
+
+/* Navigation breadcrumbs */
+.breadcrumb {
+    background: var(--gray-100) !important;
+    padding: 1rem 2rem !important;
+    margin: -2rem -2rem 2rem -2rem !important;
+    border-radius: 16px 16px 0 0 !important;
+    font-size: 0.9rem !important;
+    color: var(--gray-600) !important;
+}
+
+.breadcrumb a {
+    color: var(--primary) !important;
+    font-weight: 500 !important;
+}
+
+/* Footer for docs */
+.doc-footer {
+    margin-top: 4rem !important;
+    padding-top: 2rem !important;
+    border-top: 1px solid var(--gray-200) !important;
+    text-align: center !important;
+    color: var(--gray-600) !important;
+}
+
+.footer-links {
+    margin-bottom: 1rem !important;
+}
+
+.footer-links a {
+    margin: 0 1rem !important;
+    font-size: 0.9rem !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .markdown-body,
+    .container,
+    article {
+        margin: 1rem !important;
+        padding: 1.5rem !important;
+        border-radius: 8px !important;
+    }
+
+    h1 {
+        font-size: 2rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    pre {
+        padding: 1rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    table {
+        font-size: 0.9rem !important;
+    }
+
+    th, td {
+        padding: 0.8rem !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white !important;
+    }
+
+    .markdown-body,
+    .container,
+    article {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}

@@ -1,371 +1,616 @@
----
-layout: default
-title: "Ръководство за Bare Metal"
-description: "Високопроизводително bare metal K3s разгръщане за Odoo 18"
-nav_order: 2
----
+<link rel="stylesheet" href="markdown-style.css">
 
 # 🏭 Bare Metal K3s Deployment за Odoo 18
 
-Високопроизводително **bare metal K3s разгръщане** с **Network Bonding**, **Enterprise Security** и **Production-Ready Odoo 18 ERP**.
+<div align="center">
 
-## 🌟 Ключови Особености
+![Bare Metal Deployment](https://img.shields.io/badge/Deployment-Bare--Metal-red?style=for-the-badge&logo=kubernetes)
+![Performance](https://img.shields.io/badge/Performance-Maximum-gold?style=for-the-badge&logo=speedtest)
+![Network](https://img.shields.io/badge/Network-10GbE--Bonded-blue?style=for-the-badge&logo=ethernet)
+
+**Високопроизводително bare metal K3s разгръщане с Network Bonding и Enterprise Security**
+
+[🚀 Quick Start](#-quick-start) • [🔧 Network Bonding](#-network-bonding-configuration) • [📊 Performance](#-performance-monitoring) • [🏢 Deploy Odoo](#-odoo-18-integration)
+
+</div>
+
+---
+
+## 🌟 **Ключови особености**
 
 ### 🐳 **Production-Ready K3s Архитектура**
-- **Portainer** - Централизирано управление на K3s cluster
-- **Cloud-Native Services** - Всички компоненти като контейнери
-- **Вграден Traefik** - Production-ready ingress controller
-- **MetalLB LoadBalancer** - External service access
-- **Високопроизводително networking** - Оптимизирано за Odoo workloads
+
+| Component | Technology | Benefits |
+|-----------|------------|----------|
+| **🎛️ Portainer** | Kubernetes Management | Централизирано cluster управление |
+| **🌐 Traefik Ingress** | Production-ready | SSL termination, load balancing |
+| **⚖️ MetalLB** | LoadBalancer | External service access |
+| **🔒 CrowdSec** | AI Security | Threat detection & prevention |
 
 ### 🌐 **Enterprise Network Bonding**
-- **LACP 802.3ad Bonding** - 10GbE агрегация между сървъри
-- **Active-Backup External** - 1GbE резервна external свързаност
-- **Jumbo Frames** - 9000 байта MTU за максимална производителност
-- **Dedicated Inter-Cluster** - Отделен high-speed трафик за K3s
-- **BBR Congestion Control** - TCP оптимизация
+
+- **⚡ LACP 802.3ad** - 10GbE агрегация за максимална пропускливост
+- **🔄 Active-Backup** - 1GbE failover за external connectivity
+- **📈 Jumbo Frames** - 9000 bytes MTU за оптимална производителност
+- **🏎️ BBR TCP** - Google's congestion control за максимален throughput
+- **🎯 Dedicated Inter-Cluster** - Изолиран high-speed трафик
 
 ### 🔒 **Enterprise Security Stack**
-- **CrowdSec** - AI-powered threat detection
-- **WireGuard VPN** - Secure remote access
-- **Network Policies** - Micro-segmentation
-- **TLS Termination** - Automated SSL certificates
 
-### 🏢 **Odoo 18 Ready Infrastructure**
-- **High-Performance Storage** - Optimized для ERP workloads
-- **Database Clustering** - PostgreSQL HA setup
-- **Scalable Architecture** - От development до enterprise scale
-- **Backup & Recovery** - Automated point-in-time recovery
+- **🤖 AI-Powered Detection** - CrowdSec machine learning
+- **🔐 Secure Remote Access** - WireGuard VPN интеграция
+- **🛡️ Network Policies** - Kubernetes micro-segmentation
+- **🔑 Automated SSL** - Let's Encrypt integration
 
-## 🏗️ Архитектура
+---
+
+## 🏗️ **Bare Metal Архитектура**
 ```
 
 ┌─────────────────────────────────────────────────────────────┐
-│                    Internet/WAN                            │
+│                    Internet/WAN Gateway                     │
+│                  (192.168.1.1)                            │
 └─────────────────┬───────────────────────────────────────────┘
                   │
-            LoadBalancer IPs
-        ┌─────────┼─────────────────┐
-        │         │                 │
-        │   192.168.1.101-110       │
-        │                           │
-┌───────▼────────────────────────────▼────────────────────────┐
-│                 Master Node                                 │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │ K3s Master  │ │   MetalLB   │ │      Portainer          ││
-│  │ + Traefik   │ │LoadBalancer │ │   (Main Manager)        ││
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘│
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │ WireGuard   │ │  CrowdSec   │ │    Odoo 18 Ready        ││
-│  │    Pod      │ │    Pod      │ │                         ││
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘│
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │      Network Bonding Configuration                      ││
-│  │  bond0: 10GbE LACP (ens3f0+ens3f1) - Inter-cluster      ││
-│  │  bond1: 1GbE Backup (ens4f0+ens4f1) - External          ││
-│  │  IP: 192.168.1.10 (ext) + 10.0.0.10 (bond)              ││
-│  └─────────────────────────────────────────────────────────┘│
-└─────────────────┬───────────────────────────────────────────┘
-                  │
-            High-Speed Bond Network
-              (10.0.0.0/24 - Jumbo Frames)
+        External LoadBalancer IPs
+          (192.168.1.100-110)
                   │
 ┌─────────────────▼───────────────────────────────────────────┐
-│              Worker Nodes                                   │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │   K3s       │ │   Odoo 18   │ │    High-Performance     ││
-│  │  Agent      │ │  Workloads  │ │   Storage & Database    ││
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘│
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │      Network Bonding Configuration                      ││
-│  │  bond0: 10GbE LACP (ens3f0+ens3f1) - Inter-cluster      ││
-│  │  bond1: 1GbE Backup (ens4f0+ens4f1) - External          ││
-│  │  IP: 192.168.1.11+ (ext) + 10.0.0.11+ (bond)            ││
-│  └─────────────────────────────────────────────────────────┘│
+│                 Master Node (192.168.1.10)                 │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
+│ │ K3s Master  │ │   MetalLB   │ │      Portainer          │ │
+│ │ + Traefik   │ │LoadBalancer │ │   (Primary Manager)     │ │
+│ └─────────────┘ └─────────────┘ └─────────────────────────┘ │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
+│ │ WireGuard   │ │  CrowdSec   │ │     Odoo 18 Ready       │ │
+│ │    Pod      │ │    Pod      │ │    Infrastructure       │ │
+│ └─────────────┘ └─────────────┘ └─────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │           Network Bonding Configuration                 │ │
+│ │  🔗 bond0: 10GbE LACP (ens3f0+ens3f1) - Inter-cluster  │ │
+│ │  🔗 bond1: 1GbE Backup (ens4f0+ens4f1) - External      │ │
+│ │  📡 IPs: 192.168.1.10 (ext) + 10.0.0.10 (bond)         │ │
+│ └─────────────────────────────────────────────────────────┘ │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+        High-Speed LACP Bond Network
+         (10.0.0.0/24 - Jumbo Frames)
+                  │
+┌─────────────────▼───────────────────────────────────────────┐
+│              Worker Nodes (192.168.1.11+)                  │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
+│ │   K3s       │ │   Odoo 18   │ │   High-Performance      │ │
+│ │  Agent      │ │  Workloads  │ │  Storage & Database     │ │
+│ └─────────────┘ └─────────────┘ └─────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │           Network Bonding Configuration                 │ │
+│ │  🔗 bond0: 10GbE LACP (ens3f0+ens3f1) - Inter-cluster  │ │
+│ │  🔗 bond1: 1GbE Backup (ens4f0+ens4f1) - External      │ │
+│ │  📡 IPs: 192.168.1.11+ (ext) + 10.0.0.11+ (bond)       │ │
+│ └─────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
-## 🔧 Системни Изисквания
+---
 
-### 📋 **Hardware Requirements**
+## 📋 **Hardware Requirements**
 
-#### **Master Node**
-- **CPU**: 8+ cores, Intel/AMD с virtualization support
-- **Memory**: 16GB+ RAM (32GB+ за production Odoo)
-- **Storage**: 100GB+ NVMe SSD
-- **Network**: 4x network ports (2x 10GbE + 2x 1GbE)
+### 🖥️ **Enterprise Server Specifications**
 
-#### **Worker Nodes**
-- **CPU**: 16+ cores за Odoo workloads
-- **Memory**: 32GB+ RAM (64GB+ за enterprise deployments)
-- **Storage**: 200GB+ NVMe SSD за database & storage
-- **Network**: 4x network ports (2x 10GbE + 2x 1GbE)
+| Component | Master Node | Worker Nodes | Production Recommendation |
+|-----------|-------------|--------------|--------------------------|
+| **CPU** | 8+ cores | 16+ cores | Intel Xeon/AMD EPYC |
+| **Memory** | 16GB+ RAM | 32GB+ RAM | 64GB+ for large datasets |
+| **Storage** | 100GB+ NVMe | 200GB+ NVMe | RAID 10 for databases |
+| **Network** | 4x ports | 4x ports | 2x 10GbE + 2x 1GbE |
 
-#### **Network Infrastructure**
-- **Managed Switch** с LACP 802.3ad support
-- **10GbE Connectivity** между всички nodes
-- **Internet Gateway** на 192.168.1.1
-- **Static IP Addresses** за всички nodes
+### 🌐 **Network Infrastructure**
 
-### 🌐 **Network Planning**
+<div class="alert alert-info">
+<strong>🔧 Critical:</strong> Managed switch с LACP 802.3ad support е задължителен за bonding.
+</div>
 
-| Component | Network | IP Range | Purpose |
-|-----------|---------|----------|---------|
-| **External** | 192.168.1.0/24 | .10-.20 | External access |
-| **Inter-Cluster** | 10.0.0.0/24 | .10-.20 | High-speed bond |
-| **LoadBalancer** | 192.168.1.0/24 | .100-.110 | Service IPs |
-| **Pod Network** | 10.42.0.0/16 | Auto | K3s pods |
-| **Service Network** | 10.43.0.0/16 | Auto | K3s services |
+| Component | Specification | Notes |
+|-----------|---------------|--------|
+| **Managed Switch** | LACP 802.3ad support | Cisco, Juniper, or equivalent |
+| **10GbE Connectivity** | Between all nodes | Direct attach cables OK |
+| **Internet Gateway** | 192.168.1.1 | Standard gateway setup |
+| **Static IPs** | All nodes | DHCP reservations recommended |
 
-## 🚀 Deployment Process
+### 📊 **Network Planning Schema**
+```
+yaml
+Network Architecture:
+  External Network: "192.168.1.0/24"      # Internet-facing
+    Master: "192.168.1.10"
+    Workers: "192.168.1.11-20"
+    LoadBalancer Pool: "192.168.1.100-110"
+    
+  Inter-Cluster Network: "10.0.0.0/24"    # High-speed bonded
+    Master: "10.0.0.10"
+    Workers: "10.0.0.11-20"
+    MTU: 9000 (Jumbo Frames)
+    
+  Kubernetes Networks:
+    Pod CIDR: "10.42.0.0/16"
+    Service CIDR: "10.43.0.0/16"
+    VPN Network: "10.100.0.0/24"
+```
+---
 
-### 1. **Repository Setup**
+## 🚀 **Quick Start**
+
+### **Стъпка 1: Repository Setup**
 ```
 bash
+# Clone deployment repository
 git clone https://github.com/rosenvladimirov/k3s-odoo-docs.git
 cd k3s-odoo-docs/barebone
-chmod +x deploy-k3s.sh
+chmod +x deploy-hybrid-k3s.sh
 ```
-### 2. **Network Interface Configuration**
+### **Стъпка 2: Network Interface Configuration**
+
+<div class="alert alert-warning">
+<strong>⚠️ Important:</strong> Проверете network interface имената преди deployment!
+</div>
 ```
 bash
-# Ако имате различни network interface имена:
-export BOND_SLAVES="eth2,eth3"        # За 10GbE ports
-export EXT_SLAVES="eth0,eth1"         # За 1GbE ports
+# Check your network interfaces
+ip link show
+
+# Configure interface names if different from defaults
+export BOND_SLAVES="eth2,eth3"        # Your 10GbE interfaces
+export EXT_SLAVES="eth0,eth1"         # Your 1GbE interfaces
 export ENABLE_BONDING="true"
 
-# Или edit в deploy-k3s.sh:
+# Alternative: Edit deploy-hybrid-k3s.sh directly
 # BOND_SLAVES="${BOND_SLAVES:-your_10g_interfaces}"
 # EXT_SLAVES="${EXT_SLAVES:-your_1g_interfaces}"
 ```
-### 3. **Master Node Deployment**
+### **Стъпка 3: Master Node Deployment**
 ```
 bash
-# На Master Node (192.168.1.10)
-sudo ./deploy-k3s.sh
+# Deploy on Master Node (192.168.1.10)
+sudo ./deploy-hybrid-k3s.sh
 
-# Script ще:
-# ✅ Configure LACP bonding (ens3f0+ens3f1)
-# ✅ Configure external bonding (ens4f0+ens4f1)  
-# ✅ Setup high-performance network optimization
-# ✅ Install K3s master с bond networking
-# ✅ Deploy всички production services
-# ✅ Setup Portainer management interface
+# The script will automatically:
+# ✅ Configure LACP bonding (10GbE)
+# ✅ Setup external bonding (1GbE failover)
+# ✅ Apply network performance optimizations
+# ✅ Install K3s master with bonded networking
+# ✅ Deploy all production services (Portainer, Security, etc.)
+# ✅ Configure LoadBalancer IP pools
 ```
-### 4. **Worker Node Deployment**
+### **Стъпка 4: Worker Nodes Deployment**
 ```
 bash
 # Copy script to worker nodes
-scp deploy-k3s.sh root@192.168.1.11:~/
+scp deploy-hybrid-k3s.sh root@192.168.1.11:~/
+scp deploy-hybrid-k3s.sh root@192.168.1.12:~/
 
-# Deploy worker с bonding support
-ssh root@192.168.1.11 './deploy-k3s.sh worker'
+# Deploy workers with bonding support
+ssh root@192.168.1.11 'sudo ./deploy-hybrid-k3s.sh worker'
+ssh root@192.168.1.12 'sudo ./deploy-hybrid-k3s.sh worker'
 
-# Script ще:
-# ✅ Configure identical bonding setup
-# ✅ Setup optimized storage for Odoo
-# ✅ Install K3s agent с bond communication
-# ✅ Configure high-performance workload optimization
+# Each worker deployment includes:
+# ✅ Identical bonding configuration
+# ✅ Optimized storage for database workloads
+# ✅ High-performance K3s agent setup
+# ✅ Network optimization for Odoo workloads
 ```
-### 5. **Odoo 18 Deployment**
+<div class="alert alert-success">
+<strong>🎉 Deployment Complete!</strong> Your bare metal cluster is ready in 15-20 minutes.
+</div>
+
+---
+
+## 🔧 **Network Bonding Configuration**
+
+### **Bond Interface Specifications**
+
+| Interface | Type | Mode | Slaves | MTU | Purpose |
+|-----------|------|------|--------|-----|---------|
+| **bond0** | 10GbE | LACP 802.3ad | ens3f0,ens3f1 | **9000** | Inter-cluster traffic |
+| **bond1** | 1GbE | Active-Backup | ens4f0,ens4f1 | **1500** | External access |
+
+### **IP Address Schema**
+
+| Server | External IP | Bond IP | Role |
+|--------|-------------|---------|------|
+| **Master** | `192.168.1.10` | `10.0.0.10` | K3s control plane |
+| **Worker-1** | `192.168.1.11` | `10.0.0.11` | Database workloads |
+| **Worker-2** | `192.168.1.12` | `10.0.0.12` | Application workloads |
+| **Worker-N** | `192.168.1.1N` | `10.0.0.1N` | Scale-out nodes |
+
+### **Performance Optimizations**
+```
+yaml
+Network Performance Features:
+  BBR Congestion Control: "Maximum bandwidth utilization"
+  Jumbo Frames: "9000 bytes on bond0 for 15-20% performance gain"
+  TCP Buffer Optimization: "64MB send/receive buffers"
+  LACP Fast Mode: "Sub-second link failure detection"
+  Traffic Engineering: "K3s control plane via high-speed bond"
+  CPU Affinity: "Network interrupts pinned to specific cores"
+```
+---
+
+## 🛠️ **Service Access & Management**
+
+### **LoadBalancer Services**
+
+| Service | LoadBalancer IP | Web Access | Purpose |
+|---------|-----------------|------------|---------|
+| **🎛️ Portainer** | `192.168.1.104` | `http://portainer.k3s.local` | **Primary K3s Manager** |
+| **🌐 Traefik** | `192.168.1.101` | `http://traefik.k3s.local` | Ingress dashboard |
+| **🔒 CrowdSec** | `192.168.1.103` | `http://crowdsec.k3s.local` | Security monitoring |
+| **📊 Dashboard** | `192.168.1.105` | `http://dashboard.k3s.local` | Cluster overview |
+| **🔐 WireGuard** | `192.168.1.102` | N/A | VPN server (UDP:51820) |
+
+### **Portainer - Primary Management Interface**
+
+<div class="alert alert-info">
+<strong>💡 Pro Tip:</strong> Portainer е най-лесният начин за управление на вашия K3s cluster!
+</div>
 ```
 bash
-# След успешен K3s cluster setup
+# Web Interfaces
+Primary:  http://portainer.k3s.local
+Direct:   http://192.168.1.104:9000
+HTTPS:    https://portainer.k3s.local (if SSL enabled)
+
+# First-time setup process:
+1. Navigate to http://portainer.k3s.local
+2. Create admin account (change default admin/admin123!)
+3. Select "Kubernetes" environment
+4. Start managing your cluster through web interface
+
+# Advanced features available:
+- Deploy applications via web GUI
+- Monitor resource usage across nodes
+- Manage secrets and configs
+- View logs and troubleshoot issues
+- Deploy Helm charts
+```
+---
+
+## 🏢 **Odoo 18 Integration**
+
+### **Production-Ready Odoo Features**
+
+<div class="feature-grid">
+
+#### 🏗️ **High Availability**
+- Multi-replica PostgreSQL database cluster
+- Load-balanced Odoo application instances
+- Persistent storage with automatic failover
+
+#### ⚡ **Performance Optimization**
+- Database connection pooling
+- Redis caching for sessions
+- CDN-ready static asset serving
+- Optimized for bonded network performance
+
+#### 🔒 **Security & Compliance**
+- SSL/TLS termination with automated certificates
+- Network policies for micro-segmentation
+- Secrets management for sensitive data
+- Audit logging for compliance requirements
+
+#### 💾 **Backup & Recovery**
+- Automated daily PostgreSQL backups
+- S3-compatible storage integration
+- Point-in-time recovery capabilities
+- Disaster recovery procedures
+
+</div>
+
+### **Deploy Production Odoo 18**
+```
+bash
+# After successful K3s cluster deployment
 git clone https://github.com/rosenvladimirov/odoo-18-k3s.git
 cd odoo-18-k3s
 
-# Deploy Odoo 18 ERP
+# Configure for production
+export ODOO_HOSTNAME="erp.company.com"
+export ENABLE_SSL="true"
+export APP_REPLICAS="3"
+export ENABLE_MONITORING="true"
+
+# Deploy to production
 kubectl apply -k overlays/production/
 
-# Access Odoo
-https://erp.your-domain.com
+# Check deployment status
+kubectl get pods -n odoo
+kubectl get ingress -n odoo
+
+# Access your Odoo instance
+https://erp.company.com
 ```
-## 🔧 Network Bonding Configuration
+---
 
-### **Bond Interfaces**
-| Interface | Type | Mode | Slaves | MTU | Purpose |
-|-----------|------|------|--------|-----|---------|
-| `bond0` | 10GbE | LACP 802.3ad | ens3f0,ens3f1 | 9000 | Inter-cluster |
-| `bond1` | 1GbE | Active-Backup | ens4f0,ens4f1 | 1500 | External |
-
-### **IP Address Schema**
-| Server | External IP | Bond IP | Purpose |
-|--------|-------------|---------|---------|
-| Master | 192.168.1.10 | 10.0.0.10 | K3s control plane |
-| Worker-1 | 192.168.1.11 | 10.0.0.11 | Odoo workloads |
-| Worker-N | 192.168.1.1N | 10.0.0.1N | Scale-out nodes |
-
-### **Performance Optimizations**
-- **BBR Congestion Control** - Maximum bandwidth utilization
-- **Jumbo Frames** - 9000 bytes on bond0 for performance
-- **Optimized TCP Buffers** - 64MB network buffers
-- **LACP Fast Mode** - Sub-second failure detection
-- **Traffic Shaping** - K3s traffic via high-speed bond
-
-## 🛠️ Management Access
-
-| Service | LoadBalancer IP | URL | Purpose |
-|---------|-----------------|-----|---------|
-| **Portainer** | `192.168.1.104` | `http://portainer.k3s.local` | **Main K3s Manager** |
-| **Traefik** | `192.168.1.101` | `http://traefik.k3s.local` | Ingress dashboard |
-| **CrowdSec** | `192.168.1.103` | `http://crowdsec.k3s.local` | Security monitoring |
-| **WireGuard** | `192.168.1.102` | N/A | VPN access (port 51820) |
-
-### **Portainer - Primary Management Interface**
-```
-bash
-# Web Interface
-http://portainer.k3s.local
-http://192.168.1.104:9000
-
-# HTTPS Interface  
-https://portainer.k3s.local
-https://192.168.1.104:9443
-
-# First-time setup
-1. Access http://portainer.k3s.local
-2. Create admin user (default: admin/admin123)
-3. Select "Kubernetes" environment
-4. Start managing cluster via web interface
-```
-## 🏢 Odoo 18 Integration
-
-### **Production-Ready Features**
-- **High Availability** - Multi-replica PostgreSQL database
-- **Persistent Storage** - Longhorn distributed storage
-- **SSL Termination** - Automated Let's Encrypt certificates
-- **Load Balancing** - MetalLB external access
-- **Backup & Recovery** - S3-compatible automated backups
-- **Security** - Network policies & secret management
-
-### **Performance Optimization for Odoo**
-- **Dedicated Database Nodes** - PostgreSQL cluster on bond network
-- **High-IOPS Storage** - NVMe SSD optimized для database workloads
-- **Memory Caching** - Redis cluster для session management
-- **CDN Ready** - Static asset optimization
-- **Monitoring** - Comprehensive metrics & alerting
-
-## 🔒 Security Configuration
-
-### **Enterprise Security Stack**
-```
-bash
-# CrowdSec Security Engine
-- Host log monitoring: /var/log, /var/log/k3s
-- Collections: Linux, SSH, Nginx, Traefik protection
-- Real-time analysis: Log parsing & threat detection
-- Network monitoring: Bond interface analysis
-
-# WireGuard VPN Server
-- hostNetwork mode: Direct access to port 51820
-- VPN network: 10.100.0.0/24
-- Client generation: Admin, developer, mobile
-- Bond traffic: VPN communication via external bond
-
-# Minimal Host Security
-ufw allow in on bond1 to any port 22        # SSH
-ufw allow in on bond1 to any port 80,443    # HTTP/HTTPS  
-ufw allow in on bond1 to any port 6443      # K8s API
-ufw allow in on bond1 to any port 51820/udp # WireGuard
-ufw allow in on bond0                        # Inter-cluster
-```
-## 📊 Performance Monitoring
+## 📊 **Performance Monitoring**
 
 ### **Network Performance Commands**
 ```
 bash
-# Check bond status
+# Check bond status and health
 cat /proc/net/bonding/bond0
 cat /proc/net/bonding/bond1
 
-# Monitor network performance
-bmon                        # Real-time bandwidth monitoring
-iftop -i bond0             # Traffic analysis
-ethtool -S bond0           # Interface statistics
+# Real-time network monitoring
+bmon                        # Bandwidth monitor
+iftop -i bond0             # Traffic analysis on bond
+ethtool -S bond0           # Detailed interface statistics
 
-# Performance testing
-iperf3 -s                  # Server mode
-iperf3 -c 10.0.0.10 -t 30  # Client test via bond
+# Performance testing between nodes
+iperf3 -s                  # Server mode on target
+iperf3 -c 10.0.0.10 -t 30  # Client test via bond network
+iperf3 -c 10.0.0.10 -P 4   # Multi-stream performance test
 ```
-### **Cluster Management Commands**
+### **Cluster Health Monitoring**
 ```
 bash
-# Check cluster status
+# Cluster status overview
 kubectl get nodes -o wide
+kubectl top nodes
 kubectl get pods --all-namespaces
-
-# Portainer management
-kubectl get pods -n portainer
-kubectl logs -n portainer -l app=portainer
 
 # Service monitoring
 kubectl get svc --all-namespaces | grep LoadBalancer
+kubectl get ingress --all-namespaces
+
+# Portainer management (via CLI)
+kubectl get pods -n portainer
+kubectl logs -n portainer -l app=portainer -f
+
+# Performance metrics
+kubectl top pods --all-namespaces --sort-by=cpu
+kubectl top pods --all-namespaces --sort-by=memory
 ```
-## 🚨 Troubleshooting
+### **Advanced Performance Tuning**
+```
+bash
+# Network optimization verification
+sysctl net.core.rmem_max        # Should be 67108864 (64MB)
+sysctl net.core.wmem_max        # Should be 67108864 (64MB)
+sysctl net.ipv4.tcp_congestion_control  # Should be bbr
+
+# Bond performance analysis
+cat /proc/net/bonding/bond0 | grep -A 5 "Currently Active Slave"
+cat /proc/interrupts | grep eth
+
+# Storage performance testing
+fio --name=randwrite --ioengine=libaio --iodepth=16 --rw=randwrite \
+    --bs=4k --direct=0 --size=512M --numjobs=4 --runtime=60 --group_reporting
+```
+---
+
+## 🚨 **Troubleshooting Guide**
 
 ### **Network Bonding Issues**
+
+<div class="alert alert-warning">
+<strong>⚠️ Common Issue:</strong> Bond interface not coming up properly
+</div>
 ```
 bash
-# Check bond status
-cat /proc/net/bonding/bond0 | grep "Slave Interface"
+# Check bond interface status
+cat /proc/net/bonding/bond0 | grep "Bonding Mode"
 cat /proc/net/bonding/bond0 | grep "MII Status"
 
-# Test connectivity
-ping 10.0.0.10  # Master bond IP
-ping 10.0.0.11  # Worker bond IP
-
-# Check interface status
-ip link show bond0
+# Verify slave interface status
+ip link show | grep -E "(bond|ens)"
 ethtool bond0
 
-# Network restart if needed
+# Test connectivity via bond
+ping -I bond0 10.0.0.11  # Test to worker node
+traceroute -i bond0 10.0.0.11
+
+# Network restart if needed (USE WITH CAUTION)
 netplan apply
 systemctl restart systemd-networkd
+
+# Check for bond errors
+dmesg | grep -i bond | tail -20
+journalctl -u systemd-networkd | grep bond
 ```
-### **Performance Issues**
+### **Performance Troubleshooting**
+
+<div class="alert alert-danger">
+<strong>🔥 Issue:</strong> Lower than expected network performance
+</div>
 ```
 bash
-# Check bond utilization
+# Check current bond utilization
 cat /proc/net/bonding/bond0 | grep "Currently Active Slave"
 iftop -i bond0
 
-# Test maximum throughput
-iperf3 -s                    # On one server
-iperf3 -c 10.0.0.10 -P 4    # Multi-stream test
+# Test maximum throughput (run on both nodes)
+iperf3 -s                           # Server mode
+iperf3 -c 10.0.0.10 -P 8 -t 60     # Multi-stream client test
 
-# Check for errors
-dmesg | grep bond
-journalctl -u systemd-networkd | grep bond
+# Check for network errors
+cat /proc/net/dev | grep bond
+ethtool -S bond0 | grep error
+
+# CPU interrupt distribution
+cat /proc/interrupts | grep eth
+echo 2 > /proc/irq/24/smp_affinity  # Example interrupt pinning
 ```
 ### **K3s Cluster Issues**
 ```
 bash
-# Check cluster connectivity
+# Check cluster node connectivity
 kubectl get nodes
 kubectl describe node <node-name>
 
+# Examine cluster networking
+kubectl get pods -n kube-system
+kubectl logs -n kube-system -l app=traefik
+
 # Service troubleshooting
-kubectl get pods --all-namespaces
-kubectl logs -n <namespace> <pod-name>
+kubectl get endpoints --all-namespaces
+kubectl describe ingress --all-namespaces
+
+# Check MetalLB LoadBalancer
+kubectl get pods -n metallb-system
+kubectl logs -n metallb-system -l app=metallb
 
 # Network policy debugging
 kubectl get networkpolicies --all-namespaces
+kubectl describe networkpolicy <policy-name>
 ```
-## 📈 Scaling Guidelines
+---
 
-### **Horizontal Scaling**
-- **Add Worker Nodes**: Replicate bonding configuration
-- **Database Scaling**: PostgreSQL read replicas
-- **Storage Scaling**: Longhorn distributed expansion
-- **Load Balancing**: MetalLB pool expansion
+## 📈 **Scaling & Optimization**
 
-### **Vertical Scaling**
-- **Memory**: 64GB+ за large Odoo databases
-- **CPU**: 32+ cores за concurrent users
-- **Storage**: NVMe RAID за database performance
-- **Network**: Multiple 10GbE bonds за high throughput
+### **Horizontal Scaling Guidelines**
+```
+yaml
+Scaling Strategy:
+  Add Worker Nodes:
+    - Replicate identical bonding configuration
+    - Ensure consistent hardware specifications
+    - Maintain network performance parity
+    
+  Database Scaling:
+    - PostgreSQL read replicas on bond network
+    - Connection pooling optimization
+    - Query optimization for distributed loads
+    
+  Application Scaling:
+    - Increase Odoo replica count
+    - Configure session stickiness if needed
+    - Implement horizontal pod autoscaling
+    
+  Storage Scaling:
+    - Expand Longhorn distributed storage
+    - Add high-performance NVMe drives
+    - Implement storage classes by performance tier
+```
+### **Vertical Scaling Recommendations**
+
+| Resource | Minimum | Recommended | High-Performance |
+|----------|---------|-------------|-------------------|
+| **Memory** | 32GB/node | 64GB/node | 128GB+/node |
+| **CPU** | 16 cores/node | 32 cores/node | 64 cores+/node |
+| **Storage** | NVMe SSD | NVMe RAID 10 | NVMe with Intel Optane |
+| **Network** | Single 10GbE bond | Dual 10GbE bonds | 25GbE+ bonds |
+
+### **Advanced Performance Configurations**
+```
+bash
+# CPU performance tuning
+echo performance > /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+# Network buffer optimization
+echo 'net.core.rmem_max = 134217728' >> /etc/sysctl.conf  # 128MB
+echo 'net.core.wmem_max = 134217728' >> /etc/sysctl.conf  # 128MB
+echo 'net.ipv4.tcp_rmem = 4096 65536 134217728' >> /etc/sysctl.conf
+sysctl -p
+
+# Storage optimization for databases
+echo mq-deadline > /sys/block/nvme0n1/queue/scheduler
+echo 4096 > /sys/block/nvme0n1/queue/read_ahead_kb
+
+# Container runtime optimization
+echo 'KUBELET_EXTRA_ARGS="--max-pods=250 --kube-reserved=cpu=1,memory=2Gi"' >> /etc/default/k3s
+```
+---
+
+## 🔒 **Security Hardening**
+
+### **Enterprise Security Stack Configuration**
+```
+yaml
+Security Components:
+  CrowdSec:
+    - Host log monitoring: /var/log, /var/log/k3s
+    - Collections: Linux, SSH, Nginx, Traefik
+    - Real-time threat analysis and blocking
+    - Community threat intelligence integration
+    
+  WireGuard VPN:
+    - Host network mode for performance
+    - Client certificate management
+    - Split-tunnel configuration support
+    - Mobile client compatibility
+    
+  Network Policies:
+    - Default deny all ingress
+    - Explicit allow rules for services
+    - Namespace-based isolation
+    - External traffic controls
+```
+### **Firewall Configuration**
+
+```bash
+# Minimal host firewall rules
+ufw allow in on bond1 to any port 22        # SSH access
+ufw allow in on bond1 to any port 80,443    # HTTP/HTTPS
+ufw allow in on bond1 to any port 6443      # Kubernetes API
+ufw allow in on bond1 to any port 51820/udp # WireGuard VPN
+ufw allow in on bond0                        # Inter-cluster traffic
+ufw default deny incoming
+ufw enable
+
+# Advanced security: Rate limiting
+ufw limit ssh
+ufw limit 80/tcp
+ufw limit 443/tcp
+```
+```
+
 
 ---
 
-**🏭 Enterprise-Grade Bare Metal K3s Platform за Odoo 18** ⚡
+## 🎯 **Next Steps & Advanced Features**
 
+### 🚀 **Recommended Actions**
+
+1. **[🔒 SSL/TLS Configuration](../SECURITY-GUIDE.md)** - Implement Let's Encrypt automation
+2. **[📊 Advanced Monitoring](../MONITORING-GUIDE.md)** - Deploy Prometheus + Grafana stack
+3. **[💾 Backup Strategy](../BACKUP-GUIDE.md)** - Implement automated backup solutions
+4. **[⚡ Deploy Odoo 18](README-k3s-odoo-18.md)** - Full enterprise ERP deployment
+
+### 🔗 **Related Documentation**
+
+- **[🖥️ VM Deployment Alternative](README-VM.md)** - For development environments
+- **[⚡ K3s Odoo Enterprise Platform](README-k3s-odoo-18.md)** - Complete Odoo solution
+- **[🔄 Migration Between Deployments](MIGRATION-GUIDE.md)** - Switch between bare metal and VM
+- **[🛠️ Advanced Troubleshooting](TROUBLESHOOTING.md)** - Comprehensive problem solving
+
+---
+
+## 🤝 **Enterprise Support & Services**
+
+### **📞 Professional Services**
+- **🏗️ Architecture Consulting** - Infrastructure design and optimization
+- **⚙️ Implementation Services** - Hands-on deployment assistance
+- **🔄 Migration Services** - Zero-downtime migration support
+- **🎓 Training Programs** - Team upskilling and certification
+- **🏢 Odoo Customization** - Specialized modules and integrations
+
+### **📧 Support Contacts**
+- **Technical Support**: vladimirov.rosen@gmail.com
+- **Enterprise Sales**: byordanov@bl-consulting.net
+- **Professional Services**: vladimirov.rosen@gmail.com
+- **Community Forum**: https://github.com/rosenvladimirov/odoo-18/discussions
+
+---
+
+<div align="center">
+
+**🎉 Your Bare Metal K3s Cluster is Ready!**
+
+Maximum performance infrastructure for production Odoo 18 deployments.
+
+[📧 Get Support](mailto:vladimirov.rosen@gmail.com) • [🐛 Report Issues](https://github.com/rosenvladimirov/odoo-18-k3s/issues) • [💬 Community](https://github.com/rosenvladimirov/odoo-18-k3s/discussions)
+
+---
+
+**🏭 Enterprise-Grade Bare Metal K3s Platform за Odoo 18** ⚡  
 *Maximum Performance. Maximum Control. Production Ready.* 🚀
+
+</div>

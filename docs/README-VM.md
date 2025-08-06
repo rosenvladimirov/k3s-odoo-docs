@@ -1,50 +1,49 @@
+<link rel="stylesheet" href="markdown-style.css">
+
+# 🖥️ VM-Based K3s Deployment Guide
+
+<div align="center">
+
+![VM Deployment](https://img.shields.io/badge/Deployment-VM--Based-blue?style=for-the-badge&logo=vmware)
+![K3s Version](https://img.shields.io/badge/K3s-v1.28+-green?style=for-the-badge&logo=kubernetes)
+![Platform](https://img.shields.io/badge/Platform-Multi--Cloud-orange?style=for-the-badge&logo=cloud)
+
+**Cloud-native Kubernetes клъстер за виртуални машини с Portainer управление**
+
+[🚀 Quick Start](#-quick-start) • [📋 Requirements](#-requirements) • [🔧 Configuration](#-detailed-configuration) • [🐳 Deploy Odoo](#-deploy-odoo-18)
+
+</div>
+
 ---
-layout: default
-title: "VM Ръководство" 
-nav_order: 3
----
 
-# 🚀 Odoo-18 Pure K3s VM Клъстер
-
-Cloud-native Kubernetes клъстер за **виртуални машини** с **Portainer управление**, **Pod-базирани услуги**, **опростена мрежа** и **оптимизиран за VM производителност**.
-
-## 🌟 Ключови особености
+## 🌟 **Ключови особености**
 
 ### 🐳 **Pure Kubernetes Архитектура**
-- **Portainer** - Основен интерфейс за управление на клъстера
-- **Всички услуги в подове** - WireGuard, CrowdSec, storage услуги
-- **Вграден Traefik** - K3s native ingress контролер
-- **MetalLB LoadBalancer** - Външен достъп до услуги
-- **Минимални host услуги** - Само K3s + основна защитна стена
+
+| Component | Description | Benefits |
+|-----------|-------------|----------|
+| **🎛️ Portainer** | Основен интерфейс за управление | Централизирано Kubernetes управление |
+| **📦 Pod Services** | WireGuard, CrowdSec в контейнери | Изолация и мащабируемост |
+| **🌐 Traefik Ingress** | K3s native ingress контролер | Автоматичен SSL и routing |
+| **⚖️ MetalLB** | LoadBalancer за VM среда | Външен достъп до услуги |
 
 ### 🖥️ **VM-Оптимизирана Среда**
-- **Авто VM откриване** - Автоматично определяне на VM роля по IP
-- **Опростена мрежа** - Без сложни bond конфигурации
-- **Ресурсно ефективен** - Оптимизирани resource limits за VM среда
-- **Един интерфейс настройка** - Стандартна VM мрежова конфигурация
-- **VM-специфичен мониторинг** - Специализирани мониторинг инструменти
 
-### 🔒 **Pod-базирана Сигурност**
-- **CrowdSec под** - Сигурностен двигател с лог мониторинг
-- **WireGuard под** - VPN сървър с hostNetwork
-- **Минимална host защитна стена** - Само основни правила
-- **Изолация на услуги** - Цялата сигурностна логика в контейнери
+- **🔍 Авто VM откриване** - Автоматично определяне на VM роля по IP
+- **🌐 Опростена мрежа** - Без сложни bond конфигурации  
+- **⚡ Ресурсно ефективен** - Оптимизирани resource limits за VM
+- **🔧 Един интерфейс** - Стандартна VM мрежова конфигурация
 
-### 📊 **Модерно Управление**
-- **Portainer dashboard** - Пълно Kubernetes управление
-- **Уеб-базиран клъстер dashboard** - Преглед на услуги
-- **LoadBalancer услуги** - Директен IP достъп
-- **Cloud-native подход** - Всичко контейнеризирано
+---
 
-## 🏗️ VM Клъстер Архитектура
+## 🏗️ **VM Клъстер Архитектура**
 ```
-
 
 ┌─────────────────────────────────────────────────────────────┐
 │               VM Host Мрежа (192.168.122.0/24)              │
 └─────────────────┬───────────────────────────────────────────┘
                   │
-            LoadBalancer IP-та
+            LoadBalancer IPs
           (192.168.122.100-110)
                   │
 ┌─────────────────▼───────────────────────────────────────────┐
@@ -54,441 +53,456 @@ Cloud-native Kubernetes клъстер за **виртуални машини** 
 │  │ + Traefik   │ │LoadBalancer │ │   (Основен Управител)   ││
 │  └─────────────┘ └─────────────┘ └─────────────────────────┘│
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │ WireGuard   │ │  CrowdSec   │ │    Dashboard Под        ││
-│  │    Под      │ │    Под      │ │                         ││
+│  │ WireGuard   │ │  CrowdSec   │ │    Dashboard Pod        ││
+│  │    Pod      │ │    Pod      │ │                         ││
 │  └─────────────┘ └─────────────┘ └─────────────────────────┘│
 └─────────────────┬───────────────────────────────────────────┘
                   │
-            VM Мрежов Мост
+            VM Network Bridge
           (Hypervisor мрежа)
                   │
 ┌─────────────────▼───────────────────────────────────────────┐
 │           Worker VM 1 (192.168.122.11)                      │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │   K3s       │ │  Под        │ │   Ресурсно              ││
-│  │  Агент      │ │ Работни     │ │  Оптимизиран            ││
-│  │             │ │ Натоварвания│ │                         ││
+│  │   K3s       │ │    Pod      │ │   Resource              ││
+│  │  Agent      │ │ Workloads   │ │  Optimized              ││
 │  └─────────────┘ └─────────────┘ └─────────────────────────┘│
 └─────────────────┬───────────────────────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────────────────────┐
 │           Worker VM 2 (192.168.122.12)                      │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │   K3s       │ │  Под        │ │   Мащабируема           ││
-│  │  Агент      │ │ Работни     │ │  Архитектура            ││
-│  │             │ │ Натоварвания│ │                         ││
+│  │   K3s       │ │    Pod      │ │   Scalable              ││
+│  │  Agent      │ │ Workloads   │ │  Architecture           ││
 │  └─────────────┘ └─────────────┘ └─────────────────────────┘│
 └─────────────────────────────────────────────────────────────┘
 ```
-## 🔧 VM Среда Настройка
+---
 
-### 📋 **Системни изисквания**
+## 📋 **Requirements**
 
-#### **VM Изисквания**
-- **Master VM**: 2+ ядра, 4GB+ RAM, 20GB+ място
-- **Worker VMs**: 2+ ядра, 2GB+ RAM, 15GB+ място  
-- **Hypervisor**: VMware, VirtualBox, KVM, Hyper-V
-- **Мрежа**: Bridged или Host-only мрежа
-- **ОС**: Ubuntu Server 22.04 LTS
+### 🖥️ **VM Изисквания**
 
-#### **Мрежова Инфраструктура**
-- **VM Мрежа**: `192.168.122.0/24` (default libvirt)
-- **Master VM**: `192.168.122.10`
-- **Worker1 VM**: `192.168.122.11`
-- **Worker2 VM**: `192.168.122.12`
-- **LoadBalancer Пул**: `192.168.122.100-110`
+| Component | Minimum | Recommended | Description |
+|-----------|---------|-------------|-------------|
+| **Master VM** | 2 CPU, 4GB RAM | 4 CPU, 8GB RAM | K3s control plane |
+| **Worker VMs** | 2 CPU, 2GB RAM | 4 CPU, 4GB RAM | K3s worker nodes |
+| **Storage** | 20GB per VM | 50GB per VM | System + K3s data |
+| **Network** | 1 Gbps | 10 Gbps | VM-to-VM communication |
 
-### 🖥️ **Стъпка 1: VM Създаване и ОС Настройка**
+### 🌐 **Поддържани Hypervisors**
 
-#### **Създай Master VM**
+- ✅ **VMware** - vSphere, Workstation, ESXi
+- ✅ **VirtualBox** - Desktop virtualization  
+- ✅ **KVM/QEMU** - Linux virtualization
+- ✅ **Hyper-V** - Windows Server virtualization
+- ✅ **Cloud VMs** - AWS, Azure, GCP instances
+
+<div class="alert alert-info">
+<strong>💡 Препоръка:</strong> Използвайте bridged networking за най-добра производителност между VM-та.
+</div>
+
+---
+
+## 🚀 **Quick Start**
+
+### **Стъпка 1: VM Създаване**
 ```
 bash
-# VMware/VirtualBox/KVM VM създаване
-# - RAM: 4GB минимум
-# - CPU: 2+ ядра
-# - Диск: 20GB+ място
-# - Мрежа: Bridged/Host-only
-# - ОС: Ubuntu Server 22.04 LTS
+# VMware/VirtualBox/KVM VM configuration
+VM Specs:
+- RAM: 4GB minimum (Master), 2GB minimum (Workers)
+- CPU: 2+ cores per VM
+- Disk: 20GB+ per VM  
+- Network: Bridged/Host-only
+- OS: Ubuntu Server 22.04 LTS
 
-# ОС Инсталационна конфигурация
-Hostname: k3s-master-vm
-Username: root
-Network IP: 192.168.122.10/24
-Gateway: 192.168.122.1
-DNS: 8.8.8.8, 1.1.1.1
-
-# Пост-инсталационна настройка
-apt update && apt upgrade -y
-apt install -y openssh-server curl wget vim
-systemctl enable ssh
+# Network Configuration
+Master VM:  192.168.122.10/24
+Worker1 VM: 192.168.122.11/24  
+Worker2 VM: 192.168.122.12/24
+Gateway:    192.168.122.1
+DNS:        8.8.8.8, 1.1.1.1
 ```
-#### **Създай Worker VM-та**
-```
-bash
-# Worker VM 1 - Клонирай от Master или отделна инсталация
-Hostname: k3s-worker1-vm
-Network IP: 192.168.122.11/24
-
-# Worker VM 2 - Клонирай от Master или отделна инсталация  
-Hostname: k3s-worker2-vm
-Network IP: 192.168.122.12/24
-
-# Същата пост-инсталационна настройка
-apt update && apt upgrade -y
-apt install -y openssh-server curl wget vim
-systemctl enable ssh
-```
-### 🌐 **Стъпка 2: VM Мрежова Проверка**
-
-#### **Тествай VM Свързаност**
-```
-bash
-# От Master VM
-ping 192.168.122.11  # Worker1
-ping 192.168.122.12  # Worker2
-ping 8.8.8.8         # Интернет
-
-# От Worker VM-та
-ping 192.168.122.10  # Master
-ping 8.8.8.8         # Интернет
-
-# Провери интерфейс конфигурация
-ip addr show
-ip route show
-```
-### 🚀 **Стъпка 3: Deploy K3s VM Клъстер**
-
-#### **Изтегли Deployment Скрипт**
+### **Стъпка 2: Base OS Setup**
 ```
 bash
 # На всички VM-та
-wget https://raw.githubusercontent.com/rosenvladimirov/odoo-18/refs/heads/1.0/vm/deploy-hybrid-k3s.sh
-chmod +x deploy-vm-k3s.sh
-```
-## 🚀 VM Клъстер Deployment
+apt update && apt upgrade -y
+apt install -y openssh-server curl wget vim htop
+systemctl enable ssh
 
-### 1. **Deploy Master VM**
-```
-bash
-# На Master VM (192.168.122.10)
-sudo ./deploy-vm-k3s.sh master
-
-# Или използвай авто-откриване
-sudo ./deploy-vm-k3s.sh
-
-# Скриптът ще:
-# ✅ Конфигурира VM-оптимизирана мрежа
-# ✅ Инсталира K3s master с VM настройки
-# ✅ Deploy MetalLB с VM IP пул
-# ✅ Deploy всички pod-базирани услуги
-# ✅ Настрои VM мониторинг инструменти
-```
-### 2. **Deploy Worker VM-та**
-```
-bash
-# На Worker VM 1 (192.168.122.11)
-sudo ./deploy-vm-k3s.sh worker
-
-# На Worker VM 2 (192.168.122.12)
-sudo ./deploy-vm-k3s.sh worker
-
-# Скриптът ще:
-# ✅ Конфигурира VM мрежа
-# ✅ Присъедини K3s клъстер като worker
-# ✅ Настрои VM-специфичен мониторинг
-```
-### 3. **Провери VM Клъстер**
-```
-bash
-# На Master VM - провери клъстер статус
-kubectl get nodes
-kubectl get pods --all-namespaces
-vm-network-status
-
-# Тествай inter-VM свързаност
+# Test VM connectivity
+ping 192.168.122.10  # Master
 ping 192.168.122.11  # Worker1
 ping 192.168.122.12  # Worker2
-
-# Провери LoadBalancer услуги
-kubectl get svc --all-namespaces | grep LoadBalancer
 ```
-### 4. **Достъп до VM Клъстер Услуги**
+### **Стъпка 3: Deploy K3s Cluster**
 ```
 bash
-# Основни управленски интерфейси
-http://192.168.122.104:9000      # Portainer dashboard
-http://192.168.122.105           # Клъстер преглед
-http://192.168.122.101:8080      # Traefik dashboard
-http://192.168.122.103:8080      # CrowdSec dashboard
+# Download deployment script
+wget https://raw.githubusercontent.com/rosenvladimirov/odoo-18/refs/heads/1.0/vm/deploy-vm-k3s.sh
+chmod +x deploy-vm-k3s.sh
 
-# VPN достъп
-192.168.122.102:51820            # WireGuard VPN (UDP)
+# Deploy Master VM (192.168.122.10)
+sudo ./deploy-vm-k3s.sh master
+
+# Deploy Worker VMs (192.168.122.11, 192.168.122.12)
+sudo ./deploy-vm-k3s.sh worker
 ```
-## 🔧 VM Конфигурация
+<div class="alert alert-success">
+<strong>✅ Deployment готов за 10-15 минути!</strong> Всички услуги се разгръщат автоматично.
+</div>
 
-### **VM Мрежова Схема**
-| VM | IP Адрес | Роля | Ресурси |
-|----|------------|------|-----------|
-| Master | `192.168.122.10` | K3s control plane | 4GB RAM, 2+ CPU |
-| Worker1 | `192.168.122.11` | K3s worker node | 2GB RAM, 2+ CPU |
-| Worker2 | `192.168.122.12` | K3s worker node | 2GB RAM, 2+ CPU |
+---
 
-### **LoadBalancer IP Пул**
-| Услуга | LoadBalancer IP | Порт | Цел |
-|---------|-----------------|------|---------|
-| Traefik | `192.168.122.101` | 80, 443, 8080 | Ingress контролер |
-| WireGuard | `192.168.122.102` | 51820 (UDP) | VPN сървър |
-| CrowdSec | `192.168.122.103` | 8080 | Сигурностен dashboard |
-| Portainer | `192.168.122.104` | 9000, 9443, 30776 | **ОСНОВЕН УПРАВИТЕЛ** |
-| Dashboard | `192.168.122.105` | 80 | Клъстер преглед |
+## 🌐 **Service Access**
 
-### **VM-Оптимизирани Настройки**
-- **Ресурсни лимити** - По-ниски CPU/Memory заявки
-- **Storage оптимизация** - Един диск или простo допълнително място
-- **Мрежова простота** - Стандартна VM мрежа
-- **Мониторинг инструменти** - VM-специфични производителни инструменти
+### **LoadBalancer Services**
 
-## 🔧 VM Конфигурационни Променливи
-
-| Променлива | Default Стойност | Описание |
-|----------|---------------|-------------|
-| `VM_MASTER_IP` | `192.168.122.10` | Master VM IP адрес |
-| `VM_WORKER1_IP` | `192.168.122.11` | Worker1 VM IP адрес |
-| `VM_WORKER2_IP` | `192.168.122.12` | Worker2 VM IP адрес |
-| `VM_NETWORK` | `192.168.122.0/24` | VM мрежа CIDR |
-| `METALLB_IP_RANGE` | `192.168.122.100-110` | LoadBalancer IP пул |
-| `CLUSTER_DOMAIN` | `k3s.local` | Базов домейн за услуги |
-| `ENABLE_KUBEVIRT` | `false` | Изключи nested виртуализация |
-
-## 🌐 VM Достъп до Услуги
-
-| Услуга | LoadBalancer IP | URL Достъп | Описание |
+| Service | LoadBalancer IP | URL Access | Description |
 |---------|-----------------|------------|-------------|
-| **Portainer** | `192.168.122.104` | `http://192.168.122.104:9000` | **ОСНОВЕН УПРАВИТЕЛ** |
-| **Dashboard** | `192.168.122.105` | `http://192.168.122.105` | Клъстер преглед |
-| **Traefik** | `192.168.122.101` | `http://192.168.122.101:8080` | Ingress dashboard |
-| **CrowdSec** | `192.168.122.103` | `http://192.168.122.103:8080` | Сигурностен dashboard |
-| **WireGuard** | `192.168.122.102` | N/A (UDP 51820) | VPN сървър под |
+| **🎛️ Portainer** | `192.168.122.104` | `http://192.168.122.104:9000` | **ОСНОВЕН УПРАВИТЕЛ** |
+| **📊 Dashboard** | `192.168.122.105` | `http://192.168.122.105` | Клъстер преглед |
+| **🌐 Traefik** | `192.168.122.101` | `http://192.168.122.101:8080` | Ingress dashboard |
+| **🔒 CrowdSec** | `192.168.122.103` | `http://192.168.122.103:8080` | Security dashboard |
+| **🔐 WireGuard** | `192.168.122.102` | UDP port 51820 | VPN server |
 
-## 🐳 Portainer VM Управление
-
-### **VM-Оптимизиран Portainer**
-- **Ресурсно ефективен** - По-ниски memory/CPU лимити за VM среда
-- **Пълен клъстер контрол** - Управлявай подове, услуги, ingresses
-- **VM производителен мониторинг** - CPU, memory, мрежово използване
-- **Лесно приложно разгръщане** - Helm charts, compose stacks
-
-### **Portainer Достъп**
+### **Portainer Initial Setup**
 ```
 bash
-# Основен уеб интерфейс
+# Access Portainer web interface
 http://192.168.122.104:9000
 
-# HTTPS интерфейс  
-https://192.168.122.104:9443
-
-# Default потребителски данни
+# Default credentials (change immediately!)
 Username: admin
 Password: admin123
+
+# Setup steps:
+1. Open Portainer URL
+2. Create admin account
+3. Select "Kubernetes" environment  
+4. Start managing your VM cluster
 ```
-### **Първоначална Portainer Настройка**
-1. Отвори `http://192.168.122.104:9000`
-2. Създай admin профил (default: admin/admin123)
-3. Избери "Kubernetes" среда
-4. Започни управление на VM клъстера
+<div class="alert alert-warning">
+<strong>⚠️ Security:</strong> Сменете default паролите преди production използване!
+</div>
 
-## 🛠️ VM Управленски Команди
+---
 
-### **VM Клъстер Статус**
+## 🔧 **Detailed Configuration**
+
+### **VM Network Schema**
+```
+yaml
+VM Network Configuration:
+  Network: "192.168.122.0/24"
+  Master: "192.168.122.10"
+  Workers: 
+    - "192.168.122.11"  
+    - "192.168.122.12"
+  LoadBalancer Pool: "192.168.122.100-110"
+  
+Kubernetes Networks:
+  Pod CIDR: "10.42.0.0/16"
+  Service CIDR: "10.43.0.0/16"
+  VPN Network: "10.100.0.0/24"
+```
+### **Environment Variables**
 ```
 bash
-# VM-специфичен мрежов мониторинг
-vm-network-status
+# VM Configuration
+export VM_MASTER_IP="192.168.122.10"
+export VM_WORKER1_IP="192.168.122.11"  
+export VM_WORKER2_IP="192.168.122.12"
+export VM_NETWORK="192.168.122.0/24"
 
-# Провери VM клъстер възли
+# LoadBalancer Configuration
+export METALLB_IP_RANGE="192.168.122.100-110"
+export CLUSTER_DOMAIN="k3s.local"
+
+# Optional Features
+export ENABLE_KUBEVIRT="false"  # Disable nested virtualization
+export ENABLE_MONITORING="true"
+```
+---
+
+## 🐳 **Deploy Odoo 18**
+
+### **Quick Odoo Deployment**
+```
+bash
+# Create Odoo namespace
+kubectl create namespace odoo
+
+# Deploy Odoo with PostgreSQL
+cat << EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: odoo-18
+  namespace: odoo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: odoo
+  template:
+    metadata:
+      labels:
+        app: odoo
+    spec:
+      containers:
+      - name: odoo
+        image: odoo:18.0
+        ports:
+        - containerPort: 8069
+        env:
+        - name: HOST
+          value: "postgres"
+        - name: USER
+          value: "odoo"
+        - name: PASSWORD
+          value: "odoo"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: odoo-service
+  namespace: odoo
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8069
+    targetPort: 8069
+  selector:
+    app: odoo
+EOF
+```
+### **Access Odoo**
+```
+bash
+# Check Odoo deployment
+kubectl get pods -n odoo
+kubectl get svc -n odoo
+
+# Get LoadBalancer IP
+kubectl get svc odoo-service -n odoo
+
+# Access Odoo (typically on 192.168.122.106)
+http://ODOO_LOADBALANCER_IP:8069
+
+# Default Odoo credentials
+Database: odoo
+Email: admin@example.com
+Password: admin
+```
+<div class="alert alert-success">
+<strong>🎉 Odoo 18 готов!</strong> Отворете браузъра и започнете конфигурацията на ERP системата.
+</div>
+
+---
+
+## 📊 **Monitoring & Management**
+
+### **Cluster Health Checks**
+```
+bash
+# Check cluster status
 kubectl get nodes -o wide
+kubectl get pods --all-namespaces
 kubectl top nodes
 
-# VM ресурсо използване
+# VM resource monitoring
 htop
 free -h
 df -h
+iotop
 ```
-### **VM Управление на Услуги**
-```
-bash
-# Провери всички VM услуги
-kubectl get pods --all-namespaces
-kubectl get svc --all-namespaces | grep LoadBalancer
-
-# VM-специфични service логове
-kubectl logs -n portainer -l app=portainer
-kubectl logs -n vpn -l app=wireguard-server
-kubectl logs -n security -l app=crowdsec
-```
-### **VM Мрежова Диагностика**
+### **VM Network Diagnostics**
 ```
 bash
-# Тествай VM свързаност
+# Test VM connectivity
 ping 192.168.122.10  # Master
-ping 192.168.122.11  # Worker1  
+ping 192.168.122.11  # Worker1
 ping 192.168.122.12  # Worker2
 
-# Провери VM мрежова производителност
-iperf3 -s                    # Server режим
-iperf3 -c 192.168.122.10     # Тест към master
+# Network performance testing
+iperf3 -s                    # Server mode
+iperf3 -c 192.168.122.10     # Test to master
 
-# VM мрежови статистики
-cat /proc/net/dev
-ss -tuln | grep -E "(6443|51820|8080|9000)"
-```
-## 📦 VM Компоненти
-
-### **Master VM Услуги**
-- **K3s server** - Kubernetes control plane
-- **Traefik ingress** - HTTP/HTTPS routing
-- **MetalLB** - LoadBalancer имплементация
-- **Portainer** - Основен управленски интерфейс
-- **Pod услуги** - WireGuard, CrowdSec, Dashboard
-
-### **Worker VM Услуги**
-- **K3s agent** - Kubernetes worker възли
-- **Pod работни натоварвания** - Приложни контейнери
-- **Storage** - Локално storage осигуряване
-- **Мониторинг** - VM производителни инструменти
-
-### **VM Мрежова Конфигурация**
-- **VM Мрежа**: `192.168.122.0/24` - Основна VM комуникация
-- **Pod CIDR**: `10.42.0.0/16` - Kubernetes pod мрежа
-- **Service CIDR**: `10.43.0.0/16` - Kubernetes service мрежа
-- **VPN Мрежа**: `10.100.0.0/24` - WireGuard клиенти
-
-## 🚨 VM Отстраняване на проблеми
-
-### **VM Проблеми със Свързаността**
-```
-bash
-# Провери VM мрежова конфигурация
+# Check network interfaces
 ip addr show
 ip route show
-systemctl status systemd-networkd
-
-# Тествай VM-to-VM комуникация
-ping 192.168.122.10
-ping 192.168.122.11
-ping 192.168.122.12
-
-# Провери VM защитна стена
-ufw status
-iptables -L
+ss -tuln
 ```
-### **VM Ресурсни Проблеми**
+### **Service Logs**
 ```
 bash
-# Провери VM ресурсо използване
-free -h
-df -h
-top
-iotop
-
-# Провери VM дисково място
-lsblk
-mount
-du -sh /var/lib/k3s-data
-```
-### **VM Проблеми с Услуги**
-```
-bash
-# Провери K3s статус
+# K3s service logs
 systemctl status k3s
 systemctl status k3s-agent
 journalctl -u k3s -f
 
-# Провери VM клъстер здраве
-kubectl get nodes
-kubectl get pods --all-namespaces
-kubectl describe nodes
+# Pod service logs
+kubectl logs -n portainer -l app=portainer
+kubectl logs -n vpn -l app=wireguard-server
+kubectl logs -n security -l app=crowdsec
 ```
-### **VM LoadBalancer Проблеми**
+---
+
+## 🚨 **Troubleshooting**
+
+### **VM Connectivity Issues**
+
+<div class="alert alert-warning">
+<strong>⚠️ Issue:</strong> VMs cannot communicate<br>
+<strong>💡 Solution:</strong> Check VM network configuration and hypervisor settings
+</div>
 ```
 bash
-# Провери MetalLB на VM
+# Check VM network settings
+ip addr show
+ip route show
+systemctl status systemd-networkd
+
+# Test hypervisor network
+ping $(ip route | grep default | awk '{print $3}')
+
+# Check firewall rules
+ufw status
+iptables -L
+```
+### **Resource Constraints**
+
+<div class="alert alert-danger">  
+<strong>🔥 Issue:</strong> Pods stuck in Pending due to resources<br>
+<strong>💡 Solution:</strong> Check VM resource allocation and limits
+</div>
+```
+bash
+# Check resource usage
+kubectl top nodes
+kubectl top pods --all-namespaces
+
+# Check resource constraints
+kubectl describe nodes
+kubectl get pods -o wide --all-namespaces
+
+# Adjust VM resources in hypervisor
+# Increase RAM/CPU allocation
+```
+### **LoadBalancer Issues**
+```
+bash
+# Check MetalLB status
 kubectl get pods -n metallb-system
 kubectl logs -n metallb-system -l app=metallb
 
-# Тествай LoadBalancer свързаност
+# Verify IP pool configuration
+kubectl get configmap -n metallb-system config -o yaml
+
+# Test LoadBalancer connectivity
 curl http://192.168.122.104:9000  # Portainer
 curl http://192.168.122.101:8080  # Traefik
-curl http://192.168.122.105       # Dashboard
 ```
-## 📚 VM Следващи Стъпки
+---
 
-### **Мащабирай VM Клъстер**
+## 🛠️ **Advanced Configuration**
+
+### **Scale VM Cluster**
 ```
 bash
-# Добави повече worker VM-та
-# Създай Worker3 VM: 192.168.122.13
+# Add more Worker VMs
+# Create Worker3 VM: 192.168.122.13
+# Create Worker4 VM: 192.168.122.14
+
+# Deploy additional workers
 sudo ./deploy-vm-k3s.sh worker
 
-# Създай Worker4 VM: 192.168.122.14  
-sudo ./deploy-vm-k3s.sh worker
-
-# Провери разширения клъстер
+# Verify expanded cluster
 kubectl get nodes
 ```
-### **VM Производителна Оптимизация**
+### **Performance Optimization**
 ```
 bash
-# VM мрежово настройване
+# VM network optimization
 echo 'net.core.rmem_max = 16777216' >> /etc/sysctl.conf
 echo 'net.core.wmem_max = 16777216' >> /etc/sysctl.conf
 sysctl -p
 
-# VM storage оптимизация
-# Добави допълнителни VM дискове за persistent storage
+# VM storage optimization
+# Add additional VM disks for persistent storage
 lsblk
 fdisk -l
 ```
-### **VM Мониторинг Настройка**
+### **Monitoring Setup**
 ```
 bash
-# Инсталирай VM-специфичен мониторинг
+# Deploy Kubernetes Dashboard
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
 
-# Настрой Grafana за VM метрики
+# Install Prometheus monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/kube-prometheus-stack
+
+# Install Grafana for metrics visualization
 helm repo add grafana https://grafana.github.io/helm-charts
 helm install grafana grafana/grafana
 ```
-## 🤝 Принос
+---
 
-1. Fork repository-то
-2. Създай feature branch (`git checkout -b feature/vm-improvement`)
-3. Commit промените (`git commit -m 'Add VM feature'`)
-4. Push към branch (`git push origin feature/vm-improvement`)
-5. Отвори Pull Request
+## 📚 **Next Steps**
 
-## 📄 Лиценз
+### 🎯 **Recommended Actions**
 
-Този проект е лицензиран под MIT License - вижте [LICENSE](LICENSE) файла за детайли.
+1. **[🔒 Configure SSL/TLS](../SECURITY-GUIDE.md)**
+2. **[📊 Setup Advanced Monitoring](../MONITORING-GUIDE.md)** 
+3. **[💾 Implement Backup Strategy](../BACKUP-GUIDE.md)**
+4. **[🚀 Deploy Production Workloads](README-k3s-odoo-18.md)**
 
-## 🙏 Благодарности
+### 🔗 **Related Documentation**
 
-- **Rancher/K3s** - За lightweight Kubernetes
-- **Portainer** - За модерно Kubernetes управление  
-- **CrowdSec** - За съвместна сигурност
-- **WireGuard** - За сигурен VPN протокол
-- **MetalLB** - За LoadBalancer имплементация
-- **VM Общности** - За виртуализационни най-добри практики
+- **[🏭 Bare Metal Deployment](README-BAREBONE.md)** - For production environments
+- **[⚡ K3s Odoo Platform](README-k3s-odoo-18.md)** - Enterprise Odoo deployment  
+- **[🔄 Migration Guide](MIGRATION-GUIDE.md)** - Upgrade between deployment types
+- **[🛠️ Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
 
 ---
 
-**Направено с ❤️ за VM-базирани cloud-native разгръщания** 🚀🖥️
+## 🤝 **Support & Contributing**
 
-## 📞 Поддръжка
+### **📞 Enterprise Support**
+- **📧 Technical Support**: vladimirov.rosen@gmail.com
+- **📱 Telegram**: @odoo18_support  
+- **🌐 Documentation**: https://docs.odoo-shell.dev
 
-За въпроси и поддръжка:
-- 📧 Email: vladimirov.rosen@gmail.com
-- 📱 Telegram: @odoo18_support
-- 🌐 Документация: https://docs.odoo-shell.dev/odoo-18
+### **🔧 Contributing**
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/vm-improvement`)
+3. Commit changes (`git commit -m 'Add VM feature'`)
+4. Push to branch (`git push origin feature/vm-improvement`)
+5. Open Pull Request
 
-**VM-Оптимизиран Kubernetes Клъстер** 🖥️💨
+---
+
+<div align="center">
+
+**🎉 VM Deployment Complete!**
+
+Your K3s cluster is ready for development and production workloads.
+
+[📧 Get Support](mailto:vladimirov.rosen@gmail.com) • [🐛 Report Issues](https://github.com/rosenvladimirov/odoo-18-k3s/issues) • [💬 Community](https://github.com/rosenvladimirov/odoo-18-k3s/discussions)
+
+---
+
+**Made with ❤️ for VM-based cloud-native deployments** 🚀🖥️
+
+</div>
